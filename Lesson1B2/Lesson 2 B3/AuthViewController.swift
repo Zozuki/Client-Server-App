@@ -19,9 +19,7 @@ class AuthViewController: UIViewController, WKNavigationDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-            
-    // отправим запрос для получения погоды для Москвы
-          // Do any additional setup after loading the view.
+     
     }
     
 
@@ -31,7 +29,7 @@ class AuthViewController: UIViewController, WKNavigationDelegate {
         urlComponents.host = "oauth.vk.com"
         urlComponents.path = "/authorize"
         urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: "7864657"),
+            URLQueryItem(name: "client_id", value: "7870483"),
             URLQueryItem(name: "display", value: "mobile"),
             URLQueryItem(name: "redirect_uri", value: "https://oauth.vk.com/blank.html"),
             URLQueryItem(name: "scope", value: "262150"),
@@ -65,23 +63,29 @@ class AuthViewController: UIViewController, WKNavigationDelegate {
         let token = params["access_token"]
         let ID = params["user_id"]
         
-        if token != nil && ID != nil {
-            Session.instance.token = token!
-            Session.instance.userID = Int(ID!)!
-            print("Токен получен: \( Session.instance.token)")
-            service.getFriendList()
-            service.getGroupsList()
-            service.getPhotosAlbum()
-            // Возвращает информацию о заданном сообществе
-            service.getSearchGroup(groupID: "189089786")
-        } else {
-            print("Не удалось получить токен")
-        }
+        guard let guardToken = token else { return }
+        guard let guardID = ID else { return }
+        
+        Session.instance.token = guardToken
+        Session.instance.userID = guardID
+        print("Токен получен: \( Session.instance.token)")
+//            service.getFriendList()
+        
+//        service.getGroupsList()
+//            service.getPhotosAlbum(id:"")
+        // Возвращает информацию о заданном сообществе
+//            service.getSearchGroup(groupID: "189089786")
+       
   
         decisionHandler(.cancel)
+        
+        goToFriendList()
     }
     
     
+    func goToFriendList() {
+        performSegue(withIdentifier: "fromServiceToTabBar", sender: nil)
+    }
     
 }
 

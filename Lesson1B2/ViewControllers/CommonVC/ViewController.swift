@@ -28,6 +28,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var loadView3: UIView!
     func fillMyGroupArray() {
+        
         let group1 = Group(name: "Evident", image: UIImage(named: "Evident")!)
         let group2 = Group(name: "Japanism", image: UIImage(named: "Japanism")!)
         let group3 = Group(name: "Sans Bornes", image: UIImage(named: "SansBornes")!)
@@ -47,7 +48,6 @@ class ViewController: UIViewController {
         // для удобства
         login.text = "Nick"
         password.text = "None"
-        let imageView = UIImageView()
         password.isSecureTextEntry = true
        
         fillAllGroupsArray()

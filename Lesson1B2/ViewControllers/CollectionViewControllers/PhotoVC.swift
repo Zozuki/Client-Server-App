@@ -11,12 +11,33 @@ import UIKit
 
 class PhotoVC: UICollectionViewController {
 
-    var photos: [UIImage]?
+    var photoItems = [PhotoItem]()
+    var photos = [UIImage]()
     let interactiveTransition = InteractiveTransitionClass()
+    let service = VKService()
+    var id = Int()
+    
+    func fillPhotoAlbum() {
+        if photoItems.count != 0 {
+            for photo in photoItems{
+                let data = (try? Data(contentsOf: URL(string: photo.sizes[4].url)!))!
+                guard let image = UIImage(data: data) else { return }
+                photos.append(image)
+            }
+        } else {
+            photos.append(UIImage(named: "noAvatar")!)
+        }
+         
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         interactiveTransition.viewController = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reload))
+        service.getPhotosAlbum(id: id) { [weak self] photos in
+            self?.photoItems = photos
+            self?.fillPhotoAlbum()
+            self?.collectionView.reloadData()
+        }
 
     }
 
@@ -32,7 +53,7 @@ class PhotoVC: UICollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos?.count ?? 1
+        return photos.count
     }
     
     
@@ -40,7 +61,7 @@ class PhotoVC: UICollectionViewController {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as? PhotoCell else {
             fatalError("Unable to dequeue PhotoCell.")
         }
-        cell.photoView.image = photos?[indexPath.row] ?? UIImage(named: "noAvatar")!
+        cell.photoView.image = photos[indexPath.row] 
         return cell
     }
     
