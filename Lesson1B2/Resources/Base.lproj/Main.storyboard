@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="aUU-s6-Rkd">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
@@ -10,6 +10,41 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Auth View Controller-->
+        <scene sceneID="1sV-a9-bbZ">
+            <objects>
+                <viewController id="aUU-s6-Rkd" customClass="AuthViewController" customModule="Lesson1B2" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="pYs-1j-tHc">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9dp-Ce-49R">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="sV9-Ly-MdE"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="9dp-Ce-49R" secondAttribute="bottom" id="8w7-xj-vu6"/>
+                            <constraint firstItem="9dp-Ce-49R" firstAttribute="leading" secondItem="sV9-Ly-MdE" secondAttribute="leading" id="9rk-e5-zPV"/>
+                            <constraint firstItem="9dp-Ce-49R" firstAttribute="top" secondItem="pYs-1j-tHc" secondAttribute="top" id="Soj-54-PRw"/>
+                            <constraint firstItem="9dp-Ce-49R" firstAttribute="trailing" secondItem="sV9-Ly-MdE" secondAttribute="trailing" id="dDc-Rg-gM3"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="9dp-Ce-49R" id="K0v-I0-d9d"/>
+                        <segue destination="ks0-je-7Tw" kind="presentation" identifier="fromServiceToTabBar" modalPresentationStyle="fullScreen" id="IBr-2q-Teh"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="HY2-M2-9nE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-201" y="-658"/>
+        </scene>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -317,11 +352,11 @@
             </objects>
             <point key="canvasLocation" x="2718.840579710145" y="1277.6785714285713"/>
         </scene>
-        <!--Сообщетсва-->
+        <!--Сообщества-->
         <scene sceneID="lYN-VI-b1S">
             <objects>
                 <navigationController id="80a-4x-1dj" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Сообщетсва" image="person.3.fill" catalog="system" id="WXd-kc-R4l"/>
+                    <tabBarItem key="tabBarItem" title="Сообщества" image="person.3.fill" catalog="system" id="WXd-kc-R4l"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Rh4-te-Hwr">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -477,36 +512,6 @@
             </objects>
             <point key="canvasLocation" x="4434.7826086956529" y="-198.21428571428569"/>
         </scene>
-        <!--Photo GalleryVC-->
-        <scene sceneID="0LB-iQ-x1N">
-            <objects>
-                <viewController storyboardIdentifier="Gallery" id="AkZ-kN-qOF" customClass="PhotoGalleryVC" customModule="Lesson1B2" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="up6-vk-SgW">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="JIc-Fl-25V" customClass="PhotoGalleryView" customModule="Lesson1B2" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="44" width="414" height="518"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            </view>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="hCk-KP-obh"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="JIc-Fl-25V" firstAttribute="leading" secondItem="hCk-KP-obh" secondAttribute="leading" id="PJc-Os-FK2"/>
-                            <constraint firstItem="hCk-KP-obh" firstAttribute="bottom" secondItem="JIc-Fl-25V" secondAttribute="bottom" constant="300" id="RzL-vd-OC4"/>
-                            <constraint firstItem="JIc-Fl-25V" firstAttribute="top" secondItem="hCk-KP-obh" secondAttribute="top" id="cuK-g4-tbj"/>
-                            <constraint firstItem="hCk-KP-obh" firstAttribute="trailing" secondItem="JIc-Fl-25V" secondAttribute="trailing" id="kAI-4w-5z4"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="photoGalleryView" destination="JIc-Fl-25V" id="xhh-Pl-JDw"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ItF-i6-g6W" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="5313.04347826087" y="-198.21428571428569"/>
-        </scene>
         <!--Custom GalleryVC-->
         <scene sceneID="uEv-Aq-aad">
             <objects>
@@ -520,7 +525,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EF1-tu-X6o" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6134.7826086956529" y="-198.21428571428569"/>
+            <point key="canvasLocation" x="5319" y="-198"/>
         </scene>
         <!--Item-->
         <scene sceneID="mVA-9o-TYo">
@@ -582,6 +587,9 @@
             <point key="canvasLocation" x="1808.6956521739132" y="1277.6785714285713"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="IBr-2q-Teh"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <image name="heart" catalog="system" width="128" height="109"/>
         <image name="magnifyingglass" catalog="system" width="128" height="115"/>

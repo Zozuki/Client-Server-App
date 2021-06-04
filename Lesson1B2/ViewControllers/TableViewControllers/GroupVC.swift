@@ -20,26 +20,37 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var txtSearchBar: UITextField!
     
     var filteredGroups = [Group]()
+    let service = VKService()
+   
+    func fillGroups(groups: [GroupItem]) {
+        for groupItem in groups {
+            let data = (try? Data(contentsOf: URL(string: groupItem.photo200)!))!
+            let image = UIImage(data: data)
+            let group = Group(name: groupItem.name, image: image)
+            
+            DataStorage.shared.myGroups.append(group)
+        }
+        filteredGroups = DataStorage.shared.myGroups
+    }
     
+    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         txtSearchBar.delegate = self
         txtSearchBar.isEnabled = false
-        filteredGroups = DataStorage.shared.myGroups
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
-        
+        service.getGroupsList() { [weak self] groups in
+            self?.fillGroups(groups: groups)
+            self?.tableView.reloadData()
+        }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
     
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        tableView.reloadData()
-    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return DataStorage.shared.myGroups.count
@@ -62,7 +73,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
             var photos = [UIImage]()
             photos.append((DataStorage.shared.myGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))!)
             vc.avatar = DataStorage.shared.myGroups[indexPath.row].image ?? UIImage(named: "noAvatar")!
-            vc.photos = photos
             navigationController?.pushViewController(vc, animated: true)
         }
         
@@ -85,7 +95,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
 
             tableView.endUpdates()
         }
-        
     }
     
     //MARK: Txt Search bar config
@@ -104,7 +113,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     @IBAction func clearButtonTapped(_ sender: Any) {
         txtSearchBar.text = ""
         UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
-//            self.txtSearchBar.isEnabled = false
             self.trailingTxtSearchBarConstraint.constant = 0
             self.loupeButtonConstarint.constant = 200
         }, completion: {_ in
@@ -125,7 +133,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         } else {
             DataStorage.shared.myGroups.removeAll()
             DataStorage.shared.myGroups = filteredGroups
-            trailingTxtSearchBarConstraint.constant = 0
             tableView.reloadData()
         }
         tableView.reloadData()
@@ -160,6 +167,5 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         return true
     }
     
-    //MARK: Search bar config
 
 }
