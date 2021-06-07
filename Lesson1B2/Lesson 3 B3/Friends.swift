@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import RealmSwift
 class Friends: Codable {
     let response: FriendResponse
 
@@ -27,13 +27,13 @@ class FriendResponse: Codable {
 }
 
 // MARK: - Item
-class FriendItem: Codable {
-    let canAccessClosed: Bool
-    let id: Int
-    let photo200_Orig: String
-    let lastName, trackCode: String
-    let isClosed: Bool
-    let firstName: String
+class FriendItem: Object, Codable {
+    @objc dynamic var canAccessClosed: Bool = false
+    @objc dynamic var id: Int = 0
+    @objc dynamic var photo200_Orig: String = ""
+    @objc dynamic var lastName: String = "", trackCode: String = ""
+    @objc dynamic var isClosed: Bool = false
+    @objc dynamic var firstName: String = ""
 
     enum CodingKeys: String, CodingKey {
         case canAccessClosed = "can_access_closed"
@@ -45,7 +45,8 @@ class FriendItem: Codable {
         case firstName = "first_name"
     }
 
-    init(canAccessClosed: Bool, id: Int, photo200_Orig: String, lastName: String, trackCode: String, isClosed: Bool, firstName: String) {
+    convenience init(canAccessClosed: Bool, id: Int, photo200_Orig: String, lastName: String, trackCode: String, isClosed: Bool, firstName: String) {
+        self.init()
         self.canAccessClosed = canAccessClosed
         self.id = id
         self.photo200_Orig = photo200_Orig

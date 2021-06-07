@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 class FriendListVC: UITableViewController {
     
@@ -14,6 +15,26 @@ class FriendListVC: UITableViewController {
     var usersLetters = [String]()
     let service = VKService()
     
+    func saveFriendsData(_ friends: [FriendItem]) {
+    // обработка исключений при работе с хранилищем
+            do {
+    // получаем доступ к хранилищу
+                let realm = try Realm()
+                
+    // начинаем изменять хранилище
+                realm.beginWrite()
+                
+    // кладем все объекты класса группы в хранилище
+                realm.add(friends)
+                
+    // завершаем изменения хранилища
+                try realm.commitWrite()
+            } catch {
+    // если произошла ошибка, выводим ее в консоль
+                print(error)
+            }
+    }
+    
     func fillUserArray(friends: [FriendItem]) {
         for user in friends {
             let data = (try? Data(contentsOf: URL(string: user.photo200_Orig)!))!
@@ -21,6 +42,7 @@ class FriendListVC: UITableViewController {
             let friend = User(name: "\(user.firstName) \(user.lastName)", age: 0, avatar: image, photos: nil, id: user.id)
             DataStorage.shared.myFriendsArray.append(friend)
         }
+        
     }
     
     func sortingUsers() {
@@ -68,6 +90,7 @@ class FriendListVC: UITableViewController {
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
         self.navigationController?.delegate = self
         service.getFriendList() { [weak self] users in
+            self?.saveFriendsData(users)
             self?.fillUserArray(friends: users)
             self?.sortingUsers()
             self?.createUsersDict()

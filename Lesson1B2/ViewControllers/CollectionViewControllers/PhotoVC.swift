@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import RealmSwift
 
 
 class PhotoVC: UICollectionViewController {
@@ -17,10 +17,30 @@ class PhotoVC: UICollectionViewController {
     let service = VKService()
     var id = Int()
     
+    func savePhotosData(_ photos: [PhotoItem]) {
+    // обработка исключений при работе с хранилищем
+            do {
+    // получаем доступ к хранилищу
+                let realm = try Realm()
+                
+    // начинаем изменять хранилище
+                realm.beginWrite()
+                
+    // кладем все объекты класса группы в хранилище
+                realm.add(photos)
+                
+    // завершаем изменения хранилища
+                try realm.commitWrite()
+            } catch {
+    // если произошла ошибка, выводим ее в консоль
+                print(error)
+            }
+    }
+    
     func fillPhotoAlbum() {
         if photoItems.count != 0 {
             for photo in photoItems{
-                let data = (try? Data(contentsOf: URL(string: photo.sizes[4].url)!))!
+                let data = (try? Data(contentsOf: URL(string: photo.sizes![4].url)!))!
                 guard let image = UIImage(data: data) else { return }
                 photos.append(image)
             }
@@ -34,6 +54,7 @@ class PhotoVC: UICollectionViewController {
         interactiveTransition.viewController = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reload))
         service.getPhotosAlbum(id: id) { [weak self] photos in
+            self?.savePhotosData(photos)
             self?.photoItems = photos
             self?.fillPhotoAlbum()
             self?.collectionView.reloadData()
@@ -98,7 +119,7 @@ class PhotoVC: UICollectionViewController {
         
         if let vc = storyboard?.instantiateViewController(withIdentifier: "CustomGallery")
             as? CustomGalleryVC {
-            vc.photos = photos ?? [UIImage(named: "noAvatar")!]
+            vc.photos = photos 
             navigationController?.pushViewController(vc, animated: true)
         }
     }

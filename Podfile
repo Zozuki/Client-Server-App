@@ -9,4 +9,6 @@ target 'Lesson1B2' do
   
 pod "Alamofire"
 
+pod "RealmSwift"
+
 end

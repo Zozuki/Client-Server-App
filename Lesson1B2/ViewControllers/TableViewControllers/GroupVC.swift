@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import RealmSwift
 class GroupVC: UITableViewController, UITextFieldDelegate {
 
     
@@ -21,15 +21,36 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     
     var filteredGroups = [Group]()
     let service = VKService()
-   
+    
+    func saveGroupsData(_ groups: [GroupItem]) {
+    // обработка исключений при работе с хранилищем
+            do {
+    // получаем доступ к хранилищу
+                let realm = try Realm()
+                
+    // начинаем изменять хранилище
+                realm.beginWrite()
+                
+    // кладем все объекты класса группы в хранилище
+                realm.add(groups)
+                
+    // завершаем изменения хранилища
+                try realm.commitWrite()
+            } catch {
+    // если произошла ошибка, выводим ее в консоль
+                print(error)
+            }
+    }
+
+    
     func fillGroups(groups: [GroupItem]) {
         for groupItem in groups {
             let data = (try? Data(contentsOf: URL(string: groupItem.photo200)!))!
             let image = UIImage(data: data)
             let group = Group(name: groupItem.name, image: image)
-            
             DataStorage.shared.myGroups.append(group)
         }
+        
         filteredGroups = DataStorage.shared.myGroups
     }
     
@@ -42,6 +63,7 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
         service.getGroupsList() { [weak self] groups in
+            self?.saveGroupsData(groups)
             self?.fillGroups(groups: groups)
             self?.tableView.reloadData()
         }

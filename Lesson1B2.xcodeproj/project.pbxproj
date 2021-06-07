@@ -193,7 +193,6 @@
 			children = (
 				CE37C4CC265D662B007F3311 /* AuthViewController.swift */,
 				CE37C4CF265EAA65007F3311 /* VKService.swift */,
-				CE825F502668175200421F11 /* PhotoAlbum.swift */,
 			);
 			path = "Lesson 2 B3";
 			sourceTree = "<group>";
@@ -217,6 +216,7 @@
 				CE1EAA6D2662CA1D00560128 /* Friends.swift */,
 				CE1EAA6626616B8E00560128 /* Groups.swift */,
 				CE1EAA6A266174CB00560128 /* Data+PrettyJSON.swift */,
+				CE825F502668175200421F11 /* PhotoAlbum.swift */,
 			);
 			path = "Lesson 3 B3";
 			sourceTree = "<group>";

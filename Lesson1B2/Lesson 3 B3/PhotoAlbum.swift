@@ -5,7 +5,7 @@
 //   let photoAlbum = try? newJSONDecoder().decode(PhotoAlbum.self, from: jsonData)
 
 import Foundation
-
+import RealmSwift
 // MARK: - PhotoAlbum
 class PhotoAlbum: Codable {
     let response: PhotoResponse
@@ -27,16 +27,16 @@ class PhotoResponse: Codable {
 }
 
 // MARK: - Item
-class PhotoItem: Codable {
-    let id: Int
-    let comments: Comments
-    let likes: Likes
-    let reposts, tags: Comments
-    let date, ownerID, postID: Int
-    let text: String
-    let sizes: [Size]
-    let hasTags: Bool
-    let albumID, canComment: Int
+class PhotoItem: Object, Codable {
+    @objc dynamic var id: Int = 0
+    @objc dynamic var comments: Comments? = Comments()
+    @objc dynamic var likes: Likes? = Likes()
+    @objc dynamic var reposts: Comments? = Comments(), tags: Comments? = Comments()
+    @objc dynamic var date: Int = 0, ownerID: Int = 0, postID: Int = 0
+    @objc dynamic var text: String = ""
+    @objc dynamic var sizes: [Size]? = [Size]()
+    @objc dynamic var hasTags: Bool = false
+    @objc dynamic var albumID: Int = 0, canComment: Int = 0
 
     enum CodingKeys: String, CodingKey {
         case id, comments, likes, reposts, tags, date
@@ -48,7 +48,8 @@ class PhotoItem: Codable {
         case canComment = "can_comment"
     }
 
-    init(id: Int, comments: Comments, likes: Likes, reposts: Comments, tags: Comments, date: Int, ownerID: Int, postID: Int, text: String, sizes: [Size], hasTags: Bool, albumID: Int, canComment: Int) {
+    convenience required init(id: Int, comments: Comments, likes: Likes, reposts: Comments, tags: Comments, date: Int, ownerID: Int, postID: Int, text: String, sizes: [Size], hasTags: Bool, albumID: Int, canComment: Int) {
+        self.init()
         self.id = id
         self.comments = comments
         self.likes = likes
@@ -66,36 +67,39 @@ class PhotoItem: Codable {
 }
 
 // MARK: - Comments
-class Comments: Codable {
-    let count: Int
+class Comments: Object, Codable {
+    @objc dynamic var count: Int = 0
 
-    init(count: Int) {
+    convenience required init(count: Int) {
+        self.init()
         self.count = count
     }
 }
 
 // MARK: - Likes
-class Likes: Codable {
-    let userLikes, count: Int
+class Likes: Object, Codable {
+    @objc dynamic var userLikes: Int = 0, count: Int = 0
 
     enum CodingKeys: String, CodingKey {
         case userLikes = "user_likes"
         case count
     }
 
-    init(userLikes: Int, count: Int) {
+    convenience required init(userLikes: Int, count: Int) {
+        self.init()
         self.userLikes = userLikes
         self.count = count
     }
 }
 
 // MARK: - Size
-class Size: Codable {
-    let width, height: Int
-    let url: String
-    let type: String
+class Size: Object, Codable {
+    @objc dynamic var width: Int = 0, height: Int = 0
+    @objc dynamic var url: String = ""
+    @objc dynamic var type: String = ""
 
-    init(width: Int, height: Int, url: String, type: String) {
+    convenience required init(width: Int, height: Int, url: String, type: String) {
+        self.init()
         self.width = width
         self.height = height
         self.url = url
