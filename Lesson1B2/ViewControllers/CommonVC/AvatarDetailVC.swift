@@ -15,14 +15,12 @@ class AvatarDetailVC: UIViewController {
     
     
     var isLiked = false
-    var photos: [UIImage]?
     var avatar = UIImage()
-    
     let interactiveTransition = InteractiveTransitionClass()
+    var id = Int()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         avatarView.image = avatar
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(tappedView))
         interactiveTransition.viewController = self
@@ -43,7 +41,7 @@ class AvatarDetailVC: UIViewController {
     @IBAction func allPhotoButtonTapped(_ sender: Any) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "Photo")
             as? PhotoVC {
-            vc.photos = photos
+            vc.id = id
             navigationController?.pushViewController(vc, animated: true)
         }
     }

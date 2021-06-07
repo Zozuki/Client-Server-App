@@ -31,7 +31,7 @@ class NewGroupsVC: UITableViewController {
 //        cell?.imageView?.image =  DataStorage.shared.allGroups[indexPath.row].image
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Friend", for: indexPath) as? UserTableViewCell
-        cell?.configure(text: DataStorage.shared.allGroups[indexPath.row].name, image: DataStorage.shared.allGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))
+//        cell?.configure(text: DataStorage.shared.allGroups[indexPath.row].name, image: DataStorage.shared.allGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))
         
         return cell!
     }
@@ -43,7 +43,7 @@ class NewGroupsVC: UITableViewController {
            
             vc.title = DataStorage.shared.allGroups[indexPath.row].name
             var photos = [UIImage]()
-            photos.append((DataStorage.shared.allGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))!)
+//            photos.append((DataStorage.shared.allGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))!)
             vc.photos = photos
             navigationController?.pushViewController(vc, animated: true)
 
