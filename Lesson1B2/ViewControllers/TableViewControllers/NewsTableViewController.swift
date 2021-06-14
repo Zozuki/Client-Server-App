@@ -67,6 +67,7 @@ class NewsTableViewController: UITableViewController {
         }
         
         cell.configure(
+            
             sorsName: DataStorage.shared.news[indexPath.row].source.name,
             newText: DataStorage.shared.news[indexPath.row].text,
             sorsImage: DataStorage.shared.news[indexPath.row].source.image,
