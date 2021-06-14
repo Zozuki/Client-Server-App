@@ -11,36 +11,17 @@ import RealmSwift
 
 class PhotoVC: UICollectionViewController {
 
-    var photoItems = [PhotoItem]()
+//    var photoItems = [PhotoItem]()
     var photos = [UIImage]()
     let interactiveTransition = InteractiveTransitionClass()
     let service = VKService()
     var id = Int()
     
-    func savePhotosData(_ photos: [PhotoItem]) {
-    // обработка исключений при работе с хранилищем
-            do {
-    // получаем доступ к хранилищу
-                let realm = try Realm()
-                
-    // начинаем изменять хранилище
-                realm.beginWrite()
-                
-    // кладем все объекты класса группы в хранилище
-                realm.add(photos)
-                
-    // завершаем изменения хранилища
-                try realm.commitWrite()
-            } catch {
-    // если произошла ошибка, выводим ее в консоль
-                print(error)
-            }
-    }
-    
-    func fillPhotoAlbum() {
-        if photoItems.count != 0 {
-            for photo in photoItems{
-                let data = (try? Data(contentsOf: URL(string: photo.sizes![4].url)!))!
+    func fillPhotoAlbum(photo: [PhotoItem] ) {
+        if photo.count != 0 {
+            for photo in photo{
+                print(photo.id)
+                guard let data = try? Data(contentsOf: URL(string: (photo.sizes[4].url))!) else { return }
                 guard let image = UIImage(data: data) else { return }
                 photos.append(image)
             }
@@ -53,21 +34,25 @@ class PhotoVC: UICollectionViewController {
         super.viewDidLoad()
         interactiveTransition.viewController = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reload))
-        service.getPhotosAlbum(id: id) { [weak self] photos in
-            self?.savePhotosData(photos)
-            self?.photoItems = photos
-            self?.fillPhotoAlbum()
-            self?.collectionView.reloadData()
+        service.getPhotosAlbum(id: id) { [weak self] in
+            self?.loadPhotosFromRealm()
         }
-
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        UIView.animate(withDuration: 2, animations: {
-            
-        })
     }
     
+
+    
+    func loadPhotosFromRealm() {
+        do {
+            let realm = try Realm()
+            let photosArray = realm.objects(PhotoItem.self).filter("ownerID == %@", id)
+//            photoItems = Array(photosArray)
+            print(photosArray.count)
+            fillPhotoAlbum(photo: Array(photosArray))
+        } catch {
+            print(error)
+        }
+        collectionView.reloadData()
+    }
 
     @objc func reload() {
         collectionView.reloadData()
@@ -77,7 +62,6 @@ class PhotoVC: UICollectionViewController {
         return photos.count
     }
     
-    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as? PhotoCell else {
             fatalError("Unable to dequeue PhotoCell.")
@@ -85,7 +69,6 @@ class PhotoVC: UICollectionViewController {
         cell.photoView.image = photos[indexPath.row] 
         return cell
     }
-    
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let pi = CGFloat.pi
@@ -104,19 +87,7 @@ class PhotoVC: UICollectionViewController {
         
     }
     
-
-    
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as? PhotoCell else {
-//            fatalError("Unable to dequeue PhotoCell.")
-//        }
-//
-//        UIView.animate(withDuration: 2, animations: {
-//            print("anime \(String(describing: cell.photoView.layer.cornerRadius))")
-//            cell.imageTapped()
-//            print("anime \(String(describing: cell.photoView.layer.cornerRadius))")
-//        })
-        
         if let vc = storyboard?.instantiateViewController(withIdentifier: "CustomGallery")
             as? CustomGalleryVC {
             vc.photos = photos 

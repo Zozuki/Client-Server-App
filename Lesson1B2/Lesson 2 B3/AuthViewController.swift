@@ -69,14 +69,7 @@ class AuthViewController: UIViewController, WKNavigationDelegate {
         Session.instance.token = guardToken
         Session.instance.userID = guardID
         print("Токен получен: \( Session.instance.token)")
-//            service.getFriendList()
-        
-//        service.getGroupsList()
-//            service.getPhotosAlbum(id:"")
-        // Возвращает информацию о заданном сообществе
-//            service.getSearchGroup(groupID: "189089786")
-       
-  
+
         decisionHandler(.cancel)
         
         goToFriendList()

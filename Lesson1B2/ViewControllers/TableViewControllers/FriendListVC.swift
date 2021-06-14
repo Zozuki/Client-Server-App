@@ -10,30 +10,13 @@ import RealmSwift
 
 class FriendListVC: UITableViewController {
     
+    var friends = [FriendItem]()
     var sortUsers = [String]()
     var userDict = [String: [String]]()
     var usersLetters = [String]()
     let service = VKService()
+    let interactiveTransition = InteractiveTransitionClass()
     
-    func saveFriendsData(_ friends: [FriendItem]) {
-    // обработка исключений при работе с хранилищем
-            do {
-    // получаем доступ к хранилищу
-                let realm = try Realm()
-                
-    // начинаем изменять хранилище
-                realm.beginWrite()
-                
-    // кладем все объекты класса группы в хранилище
-                realm.add(friends)
-                
-    // завершаем изменения хранилища
-                try realm.commitWrite()
-            } catch {
-    // если произошла ошибка, выводим ее в консоль
-                print(error)
-            }
-    }
     
     func fillUserArray(friends: [FriendItem]) {
         for user in friends {
@@ -79,27 +62,41 @@ class FriendListVC: UITableViewController {
                 userDict[userKey] = [user]
             }
         }
+        
     }
     
-    
-    let interactiveTransition = InteractiveTransitionClass()
-  
     override func viewDidLoad() {
         super.viewDidLoad()
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
         self.navigationController?.delegate = self
-        service.getFriendList() { [weak self] users in
-            self?.saveFriendsData(users)
-            self?.fillUserArray(friends: users)
-            self?.sortingUsers()
-            self?.createUsersDict()
-            self?.tableView.reloadData()
+        loadFriendsFromRealm()
+        tableView.reloadData()
+        service.getFriendList() { [weak self]  in
+            DispatchQueue.main.async {
+                self?.loadFriendsFromRealm()
+            }
         }
+        friendsFillFunc()
     }
     
+    func loadFriendsFromRealm()  {
+        do {
+            let realm = try Realm()
+            print(realm.configuration.fileURL as Any)
+            let friendsArray = realm.objects(FriendItem.self)
+            friends =  Array(friendsArray)
+        } catch {
+            print(error)
+        }
+        tableView.reloadData()
+    }
     
-
+    func friendsFillFunc() {
+        fillUserArray(friends: friends)
+        sortingUsers()
+        createUsersDict()
+    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return usersLetters.count

@@ -7,13 +7,24 @@
 
 import UIKit
 import Alamofire
-
+import RealmSwift
 class VKService {
 
     let baseUrl = "https://api.vk.com"
     
     
-    func getFriendList(completion: @escaping ([FriendItem]) -> Void) {
+   
+    func clear() {
+        do {
+            let realm = try Realm()
+            try realm.write{
+                realm.deleteAll()
+            }
+        } catch  {
+            print(error)
+        }
+    }
+    func getFriendList(completion: @escaping () -> Void) {
         
         let path = "/method/friends.get"
     
@@ -35,16 +46,40 @@ class VKService {
         AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
             guard let data = repsonse.value else { return }
             guard let friend = try? JSONDecoder().decode(Friends.self, from: data) else { return }
-            DispatchQueue.main.async {
-                completion(friend.response.items)
+            DispatchQueue.main.async { [weak self] in
+                self?.saveFriendsData(friend.response.items)
+                completion()
             }
-//            Session.instance.friends = friend.response.items
-            
          }
      }
     
+    func saveFriendsData(_ friends: [FriendItem]) {
+        do {
+            // получаем доступ к хранилищу
+            let realm = try Realm()
+            // все старые  данные для текущего списка друзей
+            let oldFriends = realm.objects(FriendItem.self)
+            // начинаем изменять хранилище
+            realm.beginWrite()
+            // удаляем старые данные
+            realm.delete(oldFriends)
+            // кладем все объекты класса друзья в хранилище
+            realm.add(friends)
+            // завершаем изменение хранилища
+            try realm.commitWrite()
+
+//            let realm = try Realm()
+//            print(realm.configuration.fileURL)
+//            try realm.write() {
+//                realm.add(friends)
+//            }
+        } catch {
+            print(error)
+        }
+    }
     
-    func getPhotosAlbum(id: Int, completion: @escaping ([PhotoItem]) -> Void) {
+    
+    func getPhotosAlbum(id: Int, completion: @escaping () -> Void) {
         
         let path = "/method/photos.get"
     
@@ -67,15 +102,41 @@ class VKService {
         AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
             guard let data = repsonse.value else { return }
             guard let photo = try? JSONDecoder().decode(PhotoAlbum.self, from: data) else { return }
-            DispatchQueue.main.async {
-                completion(photo.response.items)
+            DispatchQueue.main.async { [weak self] in
+                if photo.response.items.count != 0 {
+                    self?.savePhotosData(photo.response.items, id: photo.response.items[0].ownerID)
+                    completion()
+                }
             }
         }
         
     }
     
+    func savePhotosData(_ photos: [PhotoItem], id: Int) {
+        // обработка исключений при работе с хранилищем
+        do {
+            let realm = try Realm()
+            // все старые  данные для текущего списка друзей
+            let oldPhoto = realm.objects(PhotoItem.self).filter("ownerID == %@", id)
+            // начинаем изменять хранилище
+            realm.beginWrite()
+            // удаляем старые данные
+            for photo in oldPhoto {
+                realm.delete(photo.sizes)
+            }
+            realm.delete(oldPhoto)
+            // кладем все объекты класса фото в хранилище
+            realm.add(photos)
+            // завершаем изменение хранилища
+            try realm.commitWrite()
+            
+        } catch {
+            // если произошла ошибка, выводим ее в консоль
+            print(error)
+        }
+    }
     
-    func getGroupsList(completion: @escaping ([GroupItem]) -> Void) {
+    func getGroupsList(completion: @escaping () -> Void) {
         
         let path = "/method/groups.get"
     
@@ -94,12 +155,31 @@ class VKService {
         AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
             guard let data = repsonse.value else { return }
             guard let group = try? JSONDecoder().decode(Groups.self, from: data) else { return }
-            DispatchQueue.main.async {
-                completion(group.response.items)
+            DispatchQueue.main.async { [weak self] in
+                self?.saveGroupsData(group.response.items)
+                completion()
             }
         }
     }
     
+    
+    func saveGroupsData(_ groups: [GroupItem]) {
+        do {
+            let realm = try Realm()
+            // все старые  данные для текущего списка друзей
+            let oldGroups = realm.objects(GroupItem.self)
+            // начинаем изменять хранилище
+            realm.beginWrite()
+            // удаляем старые данные
+            realm.delete(oldGroups)
+            // кладем все объекты класса друзья в хранилище
+            realm.add(groups)
+            // завершаем изменение хранилища
+            try realm.commitWrite()
+        } catch {
+            print(error)
+        }
+    }
     
     func getSearchGroup(groupID: String) {
         let path = "/method/groups.getById"

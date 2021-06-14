@@ -19,28 +19,11 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     
     @IBOutlet weak var txtSearchBar: UITextField!
     
+    var groups = [GroupItem]()
     var filteredGroups = [Group]()
     let service = VKService()
     
-    func saveGroupsData(_ groups: [GroupItem]) {
-    // обработка исключений при работе с хранилищем
-            do {
-    // получаем доступ к хранилищу
-                let realm = try Realm()
-                
-    // начинаем изменять хранилище
-                realm.beginWrite()
-                
-    // кладем все объекты класса группы в хранилище
-                realm.add(groups)
-                
-    // завершаем изменения хранилища
-                try realm.commitWrite()
-            } catch {
-    // если произошла ошибка, выводим ее в консоль
-                print(error)
-            }
-    }
+    
 
     
     func fillGroups(groups: [GroupItem]) {
@@ -62,12 +45,25 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         txtSearchBar.isEnabled = false
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
-        service.getGroupsList() { [weak self] groups in
-            self?.saveGroupsData(groups)
-            self?.fillGroups(groups: groups)
-            self?.tableView.reloadData()
+        loadGroupsFromRealm()
+        tableView.reloadData()
+        service.getGroupsList() { [weak self]  in
+            self?.loadGroupsFromRealm()
         }
+        fillGroups(groups: groups)
     }
+    
+    func loadGroupsFromRealm() {
+        do {
+            let realm = try Realm()
+            let groupsArray = realm.objects(GroupItem.self)
+            groups = Array(groupsArray)
+        } catch {
+            print(error)
+        }
+        tableView.reloadData()
+    }
+    
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
