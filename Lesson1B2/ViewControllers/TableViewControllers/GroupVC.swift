@@ -7,6 +7,7 @@
 
 import UIKit
 import RealmSwift
+
 class GroupVC: UITableViewController, UITextFieldDelegate {
 
     
@@ -19,21 +20,21 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     
     @IBOutlet weak var txtSearchBar: UITextField!
     
-    var groups = [GroupItem]()
+    var resultGroups: Results<GroupItem>!
     var filteredGroups = [Group]()
     let service = VKService()
-    
+    var token: NotificationToken?
     
 
     
-    func fillGroups(groups: [GroupItem]) {
-        for groupItem in groups {
+    func fillGroups() {
+        DataStorage.shared.myGroups.removeAll()
+        for groupItem in resultGroups {
             let data = (try? Data(contentsOf: URL(string: groupItem.photo200)!))!
             let image = UIImage(data: data)
             let group = Group(name: groupItem.name, image: image)
             DataStorage.shared.myGroups.append(group)
         }
-        
         filteredGroups = DataStorage.shared.myGroups
     }
     
@@ -45,25 +46,36 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         txtSearchBar.isEnabled = false
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
-        loadGroupsFromRealm()
-        tableView.reloadData()
-        service.getGroupsList() { [weak self]  in
-            self?.loadGroupsFromRealm()
-        }
-        fillGroups(groups: groups)
+       
+        service.getGroupsList()
+        pairTableAndRealm()
+        fillGroups()
     }
     
-    func loadGroupsFromRealm() {
-        do {
-            let realm = try Realm()
-            let groupsArray = realm.objects(GroupItem.self)
-            groups = Array(groupsArray)
-        } catch {
-            print(error)
+    func pairTableAndRealm() {
+        let realm = try! Realm()
+        resultGroups = realm.objects(GroupItem.self)
+        print(realm.configuration.fileURL as Any)
+        token = resultGroups.observe { [weak self] changes in
+            guard let tableView = self?.tableView else { return }
+            switch changes {
+            case .initial:
+                tableView.reloadData()
+            case .update(_, let deletions, let insertions, let modifications):
+                tableView.beginUpdates()
+                self?.fillGroups()
+                self?.tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+                                                    with: .automatic)
+                self?.tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+                                                    with: .automatic)
+                self?.tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+                                                    with: .automatic)
+                tableView.endUpdates()
+            case .error(let error):
+                fatalError("\(error)")
+            }
         }
-        tableView.reloadData()
     }
-    
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60

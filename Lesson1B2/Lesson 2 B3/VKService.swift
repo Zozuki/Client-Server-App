@@ -24,7 +24,7 @@ class VKService {
             print(error)
         }
     }
-    func getFriendList(completion: @escaping () -> Void) {
+    func getFriendList() {
         
         let path = "/method/friends.get"
     
@@ -32,8 +32,8 @@ class VKService {
             "access_token" : Session.instance.token,
             "user_id" : Session.instance.userID,
             "order" : "hints",
-            "count" : "30",
-            "offset" : "1",
+            "count" : "20",
+            "offset" : "0",
             "fields" : "photo_200_orig",
             "name_case" : "nom",
             "v" : "5.131",
@@ -48,7 +48,6 @@ class VKService {
             guard let friend = try? JSONDecoder().decode(Friends.self, from: data) else { return }
             DispatchQueue.main.async { [weak self] in
                 self?.saveFriendsData(friend.response.items)
-                completion()
             }
          }
      }
@@ -79,7 +78,7 @@ class VKService {
     }
     
     
-    func getPhotosAlbum(id: Int, completion: @escaping () -> Void) {
+    func getPhotosAlbum(id: Int) {
         
         let path = "/method/photos.get"
     
@@ -105,7 +104,6 @@ class VKService {
             DispatchQueue.main.async { [weak self] in
                 if photo.response.items.count != 0 {
                     self?.savePhotosData(photo.response.items, id: photo.response.items[0].ownerID)
-                    completion()
                 }
             }
         }
@@ -136,7 +134,7 @@ class VKService {
         }
     }
     
-    func getGroupsList(completion: @escaping () -> Void) {
+    func getGroupsList() {
         
         let path = "/method/groups.get"
     
@@ -157,7 +155,6 @@ class VKService {
             guard let group = try? JSONDecoder().decode(Groups.self, from: data) else { return }
             DispatchQueue.main.async { [weak self] in
                 self?.saveGroupsData(group.response.items)
-                completion()
             }
         }
     }
@@ -203,10 +200,10 @@ class VKService {
             
             print(new)
             
-            guard let group = try? JSONDecoder().decode(Groups.self, from: new) else {
-                print("fail______________")
-                return
-            }
+//            guard let group = try? JSONDecoder().decode(Groups.self, from: new) else {
+//                print("fail______________")
+//                return
+//            }
             
         
             

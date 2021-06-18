@@ -10,16 +10,18 @@ import RealmSwift
 
 class FriendListVC: UITableViewController {
     
-    var friends = [FriendItem]()
+    var resultFriends: Results<FriendItem>!
     var sortUsers = [String]()
     var userDict = [String: [String]]()
     var usersLetters = [String]()
     let service = VKService()
     let interactiveTransition = InteractiveTransitionClass()
+    var token: NotificationToken?
+    var sectionsAndRowsDict = [Int: [Int]]()
     
-    
-    func fillUserArray(friends: [FriendItem]) {
-        for user in friends {
+    func fillUserArray() {
+        DataStorage.shared.myFriendsArray.removeAll()
+        for user in resultFriends {
             let data = (try? Data(contentsOf: URL(string: user.photo200_Orig)!))!
             let image = UIImage(data: data)
             let friend = User(name: "\(user.firstName) \(user.lastName)", age: 0, avatar: image, photos: nil, id: user.id)
@@ -29,6 +31,8 @@ class FriendListVC: UITableViewController {
     }
     
     func sortingUsers() {
+        sortUsers.removeAll()
+        usersLetters.removeAll()
         var sortedFriendsArray = [User]()
         for user in DataStorage.shared.myFriendsArray {
             usersLetters.append(String(user.name.first!))
@@ -51,6 +55,7 @@ class FriendListVC: UITableViewController {
     }
     
     func createUsersDict() {
+        userDict.removeAll()
         for user in sortUsers {
             // берем первую букву пользователя и наполняем словарь
             let firstLetterIndex = user.index(user.startIndex, offsetBy: 1)
@@ -62,7 +67,25 @@ class FriendListVC: UITableViewController {
                 userDict[userKey] = [user]
             }
         }
-        
+    }
+    
+    func fillDictSectionsRows() {
+        var section = -1
+        var row = -1
+        var rows = [Int]()
+        print(userDict)
+        let keyArr = userDict.keys.sorted(by: <)
+        for key in keyArr {
+            section += 1
+            row = -1
+            rows.removeAll()
+            for _ in userDict[key]! {
+                row += 1
+                rows.append(row)
+                sectionsAndRowsDict[section] = rows
+            }
+        }
+        print(sectionsAndRowsDict)
     }
     
     override func viewDidLoad() {
@@ -70,30 +93,62 @@ class FriendListVC: UITableViewController {
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
         self.navigationController?.delegate = self
-        loadFriendsFromRealm()
-        tableView.reloadData()
-        service.getFriendList() { [weak self]  in
-            DispatchQueue.main.async {
-                self?.loadFriendsFromRealm()
+        
+    
+        service.getFriendList()
+        pairTableAndRealm()
+        friendsFillFunc()
+        fillDictSectionsRows()
+    }
+    
+    func pairTableAndRealm() {
+        let realm = try! Realm()
+        resultFriends = realm.objects(FriendItem.self)
+        print(realm.configuration.fileURL as Any)
+        token = resultFriends.observe { [weak self] changes in
+            guard let tableView = self?.tableView else { return }
+            guard let rowSectionDict = self?.sectionsAndRowsDict else { return }
+            switch changes {
+            case .initial:
+                tableView.reloadData()
+            case .update(_, let deletions, let insertions, let modifications):
+                tableView.beginUpdates()
+                self?.friendsFillFunc()
+                self?.fillDictSectionsRows()
+//                print(self?.resultFriends.count)
+                for section in rowSectionDict.keys.sorted(by: <) {
+                    for row in rowSectionDict[section]! {
+                        tableView.insertRows(at: insertions.map({ _ in IndexPath(row: row, section: section) }),
+                                             with: .automatic)
+                        tableView.deleteRows(at: deletions.map({ _ in IndexPath(row: row, section: section)}),
+                                             with: .automatic)
+                        tableView.reloadRows(at: modifications.map({ _ in IndexPath(row: row, section: section) }),
+                                             with: .automatic)
+                    }
+                }
+                tableView.endUpdates()
+            case .error(let error):
+                fatalError("\(error)")
             }
         }
-        friendsFillFunc()
     }
     
-    func loadFriendsFromRealm()  {
-        do {
-            let realm = try Realm()
-            print(realm.configuration.fileURL as Any)
-            let friendsArray = realm.objects(FriendItem.self)
-            friends =  Array(friendsArray)
-        } catch {
-            print(error)
-        }
-        tableView.reloadData()
-    }
+    
+//    func loadFriendsFromRealm()  {
+//        do {
+//            let realm = try Realm()
+//            print(realm.configuration.fileURL as Any)
+//            let friendsArray = realm.objects(FriendItem.self)
+//            resultFriends = friendsArray
+//        } catch {
+//            print(error)
+//        }
+//        tableView.reloadData()
+//    }
     
     func friendsFillFunc() {
-        fillUserArray(friends: friends)
+       
+        fillUserArray()
         sortingUsers()
         createUsersDict()
     }
@@ -139,6 +194,7 @@ class FriendListVC: UITableViewController {
         
         let userKey = usersLetters[indexPath.section]
         if let userValues = userDict[userKey] {
+            
             for user in DataStorage.shared.myFriendsArray {
                 if user.name == userValues[indexPath.row] {
                     let image = user.avatar
@@ -184,11 +240,7 @@ class FriendListVC: UITableViewController {
                                 cell?.avatar.layer.cornerRadius = 28
                                 cell?.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
                             })
-                            
                         })
-                        
-                        
-                        
                     }
                 }
             }

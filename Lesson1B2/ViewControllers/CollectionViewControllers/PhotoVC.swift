@@ -16,10 +16,14 @@ class PhotoVC: UICollectionViewController {
     let interactiveTransition = InteractiveTransitionClass()
     let service = VKService()
     var id = Int()
+    var token: NotificationToken?
+    var photosArray: Results<PhotoItem>!
     
-    func fillPhotoAlbum(photo: [PhotoItem] ) {
-        if photo.count != 0 {
-            for photo in photo{
+    
+    func fillPhotoAlbum() {
+        if photosArray.count != 0 {
+            photos.removeAll()
+            for photo in photosArray {
                 print(photo.id)
                 guard let data = try? Data(contentsOf: URL(string: (photo.sizes[4].url))!) else { return }
                 guard let image = UIImage(data: data) else { return }
@@ -34,24 +38,33 @@ class PhotoVC: UICollectionViewController {
         super.viewDidLoad()
         interactiveTransition.viewController = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reload))
-        service.getPhotosAlbum(id: id) { [weak self] in
-            self?.loadPhotosFromRealm()
-        }
+        service.getPhotosAlbum(id: id)
+        pairCollectionAndRealm()
+        fillPhotoAlbum()
     }
     
+    func pairCollectionAndRealm() {
+        guard let realm = try? Realm() else { return }
+               
+        photosArray = realm.objects(PhotoItem.self).filter("ownerID == %@", id)
+        print(photosArray.count)
+       token = photosArray.observe { [weak self] (changes: RealmCollectionChange) in
+           guard let collectionView = self?.collectionView else { return }
+           switch changes {
+           case .initial:
+               collectionView.reloadData()
+           case .update(_, let deletions, let insertions, let modifications):
+               collectionView.performBatchUpdates({
+                self?.fillPhotoAlbum()
+                   collectionView.insertItems(at: insertions.map({ IndexPath(row: $0, section: 0) }))
+                   collectionView.deleteItems(at: deletions.map({ IndexPath(row: $0, section: 0)}))
+                   collectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
+               }, completion: nil)
+           case .error(let error):
+               fatalError("\(error)")
+           }
+       }
 
-    
-    func loadPhotosFromRealm() {
-        do {
-            let realm = try Realm()
-            let photosArray = realm.objects(PhotoItem.self).filter("ownerID == %@", id)
-//            photoItems = Array(photosArray)
-            print(photosArray.count)
-            fillPhotoAlbum(photo: Array(photosArray))
-        } catch {
-            print(error)
-        }
-        collectionView.reloadData()
     }
 
     @objc func reload() {
