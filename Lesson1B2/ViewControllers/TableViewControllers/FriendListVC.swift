@@ -7,6 +7,8 @@
 
 import UIKit
 import RealmSwift
+import FirebaseDatabase
+import FirebaseAuth
 
 class FriendListVC: UITableViewController {
     
@@ -18,6 +20,8 @@ class FriendListVC: UITableViewController {
     let interactiveTransition = InteractiveTransitionClass()
     var token: NotificationToken?
     var sectionsAndRowsDict = [Int: [Int]]()
+    
+  
     
     func fillUserArray() {
         DataStorage.shared.myFriendsArray.removeAll()
@@ -217,6 +221,7 @@ class FriendListVC: UITableViewController {
                 for user in DataStorage.shared.myFriendsArray {
                     if user.name == userValues[indexPath.row] {
                         vc.id = user.id
+                        vc.userName = user.name
                         UIView.animate(withDuration: 0.4, animations: {
                             cell?.avatarView.frame.origin.x += 250
                             cell?.avatarView.alpha = 0

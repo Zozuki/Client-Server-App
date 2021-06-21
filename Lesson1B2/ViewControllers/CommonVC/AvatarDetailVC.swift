@@ -18,6 +18,8 @@ class AvatarDetailVC: UIViewController {
     var avatar = UIImage()
     let interactiveTransition = InteractiveTransitionClass()
     var id = Int()
+    var userName = String()
+    var service = VKService()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +27,8 @@ class AvatarDetailVC: UIViewController {
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(tappedView))
         interactiveTransition.viewController = self
         fullView.addGestureRecognizer(recognizer)
+        service.getUserGroup(id: id, ownerName: userName)
+        
     }
     
     @objc func tappedView() {

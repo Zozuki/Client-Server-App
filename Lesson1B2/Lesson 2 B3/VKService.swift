@@ -8,6 +8,8 @@
 import UIKit
 import Alamofire
 import RealmSwift
+import FirebaseFirestore
+
 class VKService {
 
     let baseUrl = "https://api.vk.com"
@@ -46,8 +48,10 @@ class VKService {
         AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
             guard let data = repsonse.value else { return }
             guard let friend = try? JSONDecoder().decode(Friends.self, from: data) else { return }
-            DispatchQueue.main.async { [weak self] in
-                self?.saveFriendsData(friend.response.items)
+            
+            self.saveFriendsData(friend.response.items)
+            for user in friend.response.items {
+                self.saveFriendsToFirestore([user], friendName: user.firstName)
             }
          }
      }
@@ -77,7 +81,18 @@ class VKService {
         }
     }
     
-    
+    private func saveFriendsToFirestore(_ users: [FriendItem], friendName: String) {
+        let database = Firestore.firestore()
+        let usersToSend = users
+            .map { $0.toFirestore() }
+            .reduce([:]) { $0.merging($1) { (current, _) in current } }
+        database.collection("users").document(friendName).setData(usersToSend, merge: true) { error in
+        if let error = error {
+            print(error.localizedDescription)
+            } else { print("data saved")}
+        }
+    }
+
     func getPhotosAlbum(id: Int) {
         
         let path = "/method/photos.get"
@@ -178,13 +193,15 @@ class VKService {
         }
     }
     
-    func getSearchGroup(groupID: String) {
-        let path = "/method/groups.getById"
+    func getUserGroup(id: Int, ownerName: String) {
+        
+        let path = "/method/groups.get"
     
         let parameters: Parameters = [
-            "group_id" : groupID,
+            "user_id" : "\(id)",
+            "count" : "10",
+            "extended" : "1",
             "fields" : "members_count",
-            "count" : "1",
             "v" : "5.131",
             "access_token" : Session.instance.token,
             "lang" : "en"
@@ -192,22 +209,27 @@ class VKService {
 
          let url = baseUrl+path
          
-         AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
+        AF.request(url, method: .get, parameters: parameters).responseData { [weak self] repsonse in
             guard let data = repsonse.value else { return }
-            let prettyData = data.prettyJSON! as String
-//            print(prettyData)
-            let new = prettyData.data(using: .utf8)!
-            
-            print(new)
-            
-//            guard let group = try? JSONDecoder().decode(Groups.self, from: new) else {
-//                print("fail______________")
-//                return
-//            }
-            
-        
+            guard let groups = try? JSONDecoder().decode(Groups.self, from: data) else { return }
+            print(groups.response.items.count)
+            for group in groups.response.items {
+                self?.saveGroupsToFirestore([group], groupName: group.name, ownerName: ownerName)
+            }
             
          }
+    }
+    
+    private func saveGroupsToFirestore(_ groups: [GroupItem], groupName: String, ownerName: String) {
+        let database = Firestore.firestore()
+        let groupsToSend = groups
+            .map { $0.toFirestore(owner: groupName) }
+            .reduce([:]) { $0.merging($1) { (current, _) in current } }
+        database.collection("\(ownerName)'s groups").document(groupName).setData(groupsToSend, merge: true) { error in
+        if let error = error {
+            print(error.localizedDescription)
+            } else { print("data saved")}
+        }
     }
 
 }

@@ -10,5 +10,9 @@ target 'Lesson1B2' do
 pod "Alamofire"
 
 pod "RealmSwift"
+pod 'Firebase/Auth'
+pod 'Firebase/Firestore'
+pod 'Firebase/Analytics'
+pod 'Firebase/Database'
 
 end

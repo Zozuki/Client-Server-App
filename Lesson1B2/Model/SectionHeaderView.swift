@@ -27,7 +27,7 @@ class SectionHeaderView: UIView {
         letter.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16).isActive = true
         letter.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         letter.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        backgroundColor = #colorLiteral(red: 0.7339813113, green: 0.8357322812, blue: 0.9017627835, alpha: 1)
+        backgroundColor = #colorLiteral(red: 0.7339813113, green: 0.8357322812, blue: 0.9017627835, alpha: 1) 
     }
 }
 

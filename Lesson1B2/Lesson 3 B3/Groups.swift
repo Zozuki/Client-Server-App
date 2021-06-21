@@ -37,6 +37,12 @@ class GroupItem: Object, Codable {
     @objc dynamic var  photo100: String = ""
     @objc dynamic var  name: String = "", screenName: String = ""
     
+    func toFirestore(owner: String) -> [String: Any] {
+        return [
+            String(format: "%0.f", owner) : name
+        ]
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case isClosed = "is_closed"

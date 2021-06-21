@@ -36,6 +36,7 @@ class PhotoVC: UICollectionViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(id)
         interactiveTransition.viewController = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reload))
         service.getPhotosAlbum(id: id)

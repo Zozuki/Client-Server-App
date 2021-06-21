@@ -7,6 +7,7 @@
 
 import Foundation
 import RealmSwift
+
 class Friends: Codable {
     let response: FriendResponse
 
@@ -28,6 +29,7 @@ class FriendResponse: Codable {
 
 // MARK: - Item
 class FriendItem: Object, Codable {
+    
     @objc dynamic var canAccessClosed: Bool = false
     @objc dynamic var id: Int = 0
     @objc dynamic var photo200_Orig: String = ""
@@ -35,6 +37,12 @@ class FriendItem: Object, Codable {
     @objc dynamic var isClosed: Bool = false
     @objc dynamic var firstName: String = ""
 
+    func toFirestore() -> [String: Any] {
+        return [
+            String(format: "%0.f", firstName) : id
+        ]
+    }
+    
     enum CodingKeys: String, CodingKey {
         case canAccessClosed = "can_access_closed"
         case id
@@ -44,7 +52,7 @@ class FriendItem: Object, Codable {
         case isClosed = "is_closed"
         case firstName = "first_name"
     }
-
+    
     convenience init(canAccessClosed: Bool, id: Int, photo200_Orig: String, lastName: String, trackCode: String, isClosed: Bool, firstName: String) {
         self.init()
         self.canAccessClosed = canAccessClosed
