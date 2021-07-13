@@ -13,8 +13,6 @@ import FirebaseFirestore
 class VKService {
 
     let baseUrl = "https://api.vk.com"
-    
-    
    
     func clear() {
         do {
@@ -26,6 +24,7 @@ class VKService {
             print(error)
         }
     }
+    
     func getFriendList() {
         
         let path = "/method/friends.get"
