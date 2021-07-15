@@ -26,10 +26,11 @@ class NewsTableViewController: UITableViewController {
     var liked = [Int:Bool]()
     var views = 0
     var newsTextHeight = CGFloat()
+    let service = VKService()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+            
         fillTheNews()
         tableView.delegate = self
         tableView.dataSource = self

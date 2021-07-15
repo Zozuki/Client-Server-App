@@ -36,6 +36,7 @@
 		CE7025022631B9D50002908C /* NewsTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE7025002631B9D50002908C /* NewsTableViewCell.xib */; };
 		CE7025052631BA100002908C /* NewsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7025042631BA100002908C /* NewsTableViewController.swift */; };
 		CE70250A2631C67B0002908C /* News.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7025092631C67B0002908C /* News.swift */; };
+		CE7113D926A0615700DABB56 /* NewsPhotoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7113D826A0615700DABB56 /* NewsPhotoModel.swift */; };
 		CE755EC0264A974500965652 /* CloudView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE755EBF264A974500965652 /* CloudView.swift */; };
 		CE7CD0C226208EF80074D6C8 /* FriendListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7CD0C126208EF80074D6C8 /* FriendListVC.swift */; };
 		CE7CD0C62620947A0074D6C8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7CD0C52620947A0074D6C8 /* User.swift */; };
@@ -52,6 +53,7 @@
 		CED9CCB026319A290076BF44 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED9CCAF26319A290076BF44 /* SectionHeaderView.swift */; };
 		CEE4361126481C9E00FB560A /* PopAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE4361026481C9E00FB560A /* PopAnimation.swift */; };
 		CEF6D88626277AA20036F862 /* AvatarDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF6D88526277AA20036F862 /* AvatarDetailVC.swift */; };
+		CEF76E4C26A0851800CD9F2E /* NewsPostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF76E4B26A0851800CD9F2E /* NewsPostModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -85,6 +87,7 @@
 		CE7025002631B9D50002908C /* NewsTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewsTableViewCell.xib; sourceTree = "<group>"; };
 		CE7025042631BA100002908C /* NewsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTableViewController.swift; sourceTree = "<group>"; };
 		CE7025092631C67B0002908C /* News.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = News.swift; sourceTree = "<group>"; };
+		CE7113D826A0615700DABB56 /* NewsPhotoModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsPhotoModel.swift; sourceTree = "<group>"; };
 		CE755EBF264A974500965652 /* CloudView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudView.swift; sourceTree = "<group>"; };
 		CE7CD0C126208EF80074D6C8 /* FriendListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendListVC.swift; sourceTree = "<group>"; };
 		CE7CD0C52620947A0074D6C8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -103,6 +106,7 @@
 		CED9CCAF26319A290076BF44 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		CEE4361026481C9E00FB560A /* PopAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopAnimation.swift; sourceTree = "<group>"; };
 		CEF6D88526277AA20036F862 /* AvatarDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarDetailVC.swift; sourceTree = "<group>"; };
+		CEF76E4B26A0851800CD9F2E /* NewsPostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsPostModel.swift; sourceTree = "<group>"; };
 		E6AD1642EB2620D4458860ED /* Pods-Lesson1B2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Lesson1B2.release.xcconfig"; path = "Target Support Files/Pods-Lesson1B2/Pods-Lesson1B2.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -246,6 +250,8 @@
 				CE1EAA6626616B8E00560128 /* Groups.swift */,
 				CE1EAA6A266174CB00560128 /* Data+PrettyJSON.swift */,
 				CE825F502668175200421F11 /* PhotoAlbum.swift */,
+				CE7113D826A0615700DABB56 /* NewsPhotoModel.swift */,
+				CEF76E4B26A0851800CD9F2E /* NewsPostModel.swift */,
 			);
 			path = "Lesson 3 B3";
 			sourceTree = "<group>";
@@ -435,11 +441,13 @@
 				CE0E2E892625F2D200EEB0D1 /* UserTableViewCell.swift in Sources */,
 				CE755EC0264A974500965652 /* CloudView.swift in Sources */,
 				CE508EFD26221BEA00DBD032 /* GroupVC.swift in Sources */,
+				CEF76E4C26A0851800CD9F2E /* NewsPostModel.swift in Sources */,
 				CE508EF92621EEEC00DBD032 /* Group.swift in Sources */,
 				CE7CD0C62620947A0074D6C8 /* User.swift in Sources */,
 				CE596C8B269E3C9300ED4E2E /* NewsImageCell.swift in Sources */,
 				CED25A13263E6454008C1689 /* CustomGalleryVC.swift in Sources */,
 				CE37C4D0265EAA65007F3311 /* VKService.swift in Sources */,
+				CE7113D926A0615700DABB56 /* NewsPhotoModel.swift in Sources */,
 				CE1EAA6E2662CA1D00560128 /* Friends.swift in Sources */,
 				CE0640B12649AD5C00C65EBD /* InteractiveTransitionClass.swift in Sources */,
 				CEC820C926178E4E0027D2AD /* SceneDelegate.swift in Sources */,

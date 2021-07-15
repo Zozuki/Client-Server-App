@@ -231,4 +231,90 @@ class VKService {
         }
     }
 
+    
+    func getUserPhotosNews(completion: @escaping ([NewsPhotoItem], [NewsPhotoGroup], [NewsPhotoProfile]) -> Void) {
+        
+        let path = "/method/newsfeed.get"
+    
+        let getNewsGroup = DispatchGroup()
+        
+        var newsItem = [NewsPhotoItem]()
+        var newsGroup = [NewsPhotoGroup]()
+        var newsProfile = [NewsPhotoProfile]()
+        
+        let parameters: Parameters = [
+            "user_id" : Session.instance.userID,
+            "filters" : "photo",
+            "return_banned" : "0",
+            "max_photos" : "1",
+            "source_ids" : "groups",
+            "count" : "10",
+            "v" : "5.131",
+            "access_token" : Session.instance.token,
+            "lang" : "en"
+         ]
+
+         let url = baseUrl+path
+        DispatchQueue.global().async(group: getNewsGroup) {
+            AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
+                guard let data = repsonse.value else { return }
+                
+                guard let news = try? JSONDecoder().decode(NewsPhotoModel.self, from: data) else { return }
+               
+                newsItem = news.response.items
+                newsGroup = news.response.groups
+                newsProfile = news.response.profiles
+                
+                getNewsGroup.notify(queue: .main) {
+                  completion(newsItem, newsGroup, newsProfile)
+                }
+            }
+        }
+       
+    }
+    
+    
+    func getUserPostNews(completion: @escaping ([NewsPostItem], [NewsPostGroup], [NewsPostProfile]) -> Void) {
+        
+        let path = "/method/newsfeed.get"
+        
+        let getNewsGroup = DispatchGroup()
+        
+        var newsItem = [NewsPostItem]()
+        var newsGroup = [NewsPostGroup]()
+        var newsProfile = [NewsPostProfile]()
+        
+        let parameters: Parameters = [
+            "user_id" : Session.instance.userID,
+            "filters" : "post",
+            "return_banned" : "0",
+            "max_photos" : "1",
+            "source_ids" : "groups",
+            "count" : "50",
+            "v" : "5.131",
+            "access_token" : Session.instance.token,
+            "lang" : "en"
+         ]
+
+        let url = baseUrl+path
+        
+        DispatchQueue.global().async(group: getNewsGroup) {
+            AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
+                
+                guard let data = repsonse.value else { return }
+                
+                guard let news = try? JSONDecoder().decode(NewsPostModel.self, from: data) else { return }
+                
+                newsItem = news.response.items
+                newsGroup = news.response.groups
+                newsProfile = news.response.profiles
+                
+                getNewsGroup.notify(queue: .main) {
+                    completion(newsItem, newsGroup, newsProfile)
+                }
+                
+            }
+        }
+    }
+    
 }
