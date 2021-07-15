@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -47,7 +47,7 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MisbhvNew2" translatesAutoresizingMaskIntoConstraints="NO" id="46o-ec-N7U">
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="46o-ec-N7U">
                         <rect key="frame" x="0.0" y="395" width="783" height="0.0"/>
                         <constraints>
                             <constraint firstAttribute="height" id="IXO-ya-IhV"/>
@@ -61,9 +61,6 @@
                                 <rect key="frame" x="0.0" y="0.0" width="20.5" height="22"/>
                                 <color key="tintColor" systemColor="systemGrayColor"/>
                                 <state key="normal" image="heart" catalog="system"/>
-                                <connections>
-                                    <action selector="heartButtonTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="ojJ-9V-dXE"/>
-                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hjf-o8-m9o" userLabel="Like Label">
                                 <rect key="frame" x="24.5" y="0.0" width="10.5" height="22"/>
@@ -132,22 +129,10 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" systemColor="secondarySystemGroupedBackgroundColor"/>
-            <connections>
-                <outlet property="heartButton" destination="Uaq-lI-V8V" id="EFf-Ru-4jx"/>
-                <outlet property="likeLabel" destination="hjf-o8-m9o" id="uwn-gw-mpE"/>
-                <outlet property="newsImage" destination="46o-ec-N7U" id="2H4-zL-M7q"/>
-                <outlet property="newsImageTopConstraint" destination="IXO-ya-IhV" id="5ns-WH-H9K"/>
-                <outlet property="newsText" destination="nK0-Wf-YFk" id="gPH-Ln-X1T"/>
-                <outlet property="sourceImage" destination="Xtf-BZ-OL4" id="8DP-bt-MkZ"/>
-                <outlet property="sourceName" destination="Bjh-Mw-G7E" id="Mcq-Uf-PBC"/>
-                <outlet property="sourceView" destination="h2c-ET-s1q" id="Ghp-Sa-oP5"/>
-                <outlet property="viewingLabel" destination="OlE-NY-dcb" id="gAH-Qy-R3s"/>
-            </connections>
             <point key="canvasLocation" x="111.59420289855073" y="76.004464285714278"/>
         </tableViewCell>
     </objects>
     <resources>
-        <image name="MisbhvNew2" width="750" height="917"/>
         <image name="arrowshape.turn.up.right" catalog="system" width="128" height="106"/>
         <image name="bubble.left" catalog="system" width="128" height="110"/>
         <image name="eye.fill" catalog="system" width="128" height="78"/>
