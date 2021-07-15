@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="NewsTextCell" rowHeight="102" id="uFe-db-g2O" customClass="NewsTextCell" customModule="Lesson1B2" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="413" height="102"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="uFe-db-g2O" id="DM7-qB-dB5">
+                <rect key="frame" x="0.0" y="0.0" width="413" height="102"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2EY-zO-v8F">
+                        <rect key="frame" x="10" y="10" width="393" height="82"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="2EY-zO-v8F" firstAttribute="top" secondItem="DM7-qB-dB5" secondAttribute="top" constant="10" id="GrY-5F-r5R"/>
+                    <constraint firstAttribute="trailing" secondItem="2EY-zO-v8F" secondAttribute="trailing" constant="10" id="Wmw-70-0Iu"/>
+                    <constraint firstItem="2EY-zO-v8F" firstAttribute="leading" secondItem="DM7-qB-dB5" secondAttribute="leading" constant="10" id="gas-eH-1u8"/>
+                    <constraint firstAttribute="bottom" secondItem="2EY-zO-v8F" secondAttribute="bottom" constant="10" id="zDU-E9-NYi"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="NewsText" destination="2EY-zO-v8F" id="O3Q-t4-dPr"/>
+            </connections>
+            <point key="canvasLocation" x="199.27536231884059" y="29.464285714285712"/>
+        </tableViewCell>
+    </objects>
+</document>
