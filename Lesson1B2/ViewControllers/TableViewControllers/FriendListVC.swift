@@ -20,7 +20,7 @@ class FriendListVC: UITableViewController {
     let interactiveTransition = InteractiveTransitionClass()
     var token: NotificationToken?
     var sectionsAndRowsDict = [Int: [Int]]()
-    
+    let queue = OperationQueue()
   
     
     func fillUserArray() {
@@ -77,7 +77,7 @@ class FriendListVC: UITableViewController {
         var section = -1
         var row = -1
         var rows = [Int]()
-        print(userDict)
+        
         let keyArr = userDict.keys.sorted(by: <)
         for key in keyArr {
             section += 1
@@ -89,7 +89,7 @@ class FriendListVC: UITableViewController {
                 sectionsAndRowsDict[section] = rows
             }
         }
-        print(sectionsAndRowsDict)
+        
     }
     
     override func viewDidLoad() {
@@ -98,16 +98,31 @@ class FriendListVC: UITableViewController {
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
         self.navigationController?.delegate = self
         
-    
-        service.getFriendList()
-        pairTableAndRealm()
-        friendsFillFunc()
-        fillDictSectionsRows()
+        let getDataOp = GetDataOperation()
+        queue.addOperation(getDataOp)
+
+        let parseDataOp = ParseDataOperation()
+        parseDataOp.addDependency(getDataOp)
+        queue.addOperation(parseDataOp)
+
+        let saveDataOp = SaveDataToRealmOperation()
+        saveDataOp.addDependency(parseDataOp)
+        queue.addOperation(saveDataOp)
+        
+        let reloadTableOp = ReloadTableViewOperation(viewController: self)
+        reloadTableOp.addDependency(saveDataOp) // Добавляем зависимость от ParseDataOperation
+
+        // Порядок исполнения операций
+        // GetDataOperation -> ParseDataOperation -> SaveDataToRealmOperation -> ReloadTableViewOperation
+
+
+        OperationQueue.main.addOperation(reloadTableOp)
+        
+
     }
     
     func pairTableAndRealm() {
         let realm = try! Realm()
-        resultFriends = realm.objects(FriendItem.self)
         print(realm.configuration.fileURL as Any)
         token = resultFriends.observe { [weak self] changes in
             guard let tableView = self?.tableView else { return }
@@ -119,7 +134,6 @@ class FriendListVC: UITableViewController {
                 tableView.beginUpdates()
                 self?.friendsFillFunc()
                 self?.fillDictSectionsRows()
-//                print(self?.resultFriends.count)
                 for section in rowSectionDict.keys.sorted(by: <) {
                     for row in rowSectionDict[section]! {
                         tableView.insertRows(at: insertions.map({ _ in IndexPath(row: row, section: section) }),
@@ -137,18 +151,6 @@ class FriendListVC: UITableViewController {
         }
     }
     
-    
-//    func loadFriendsFromRealm()  {
-//        do {
-//            let realm = try Realm()
-//            print(realm.configuration.fileURL as Any)
-//            let friendsArray = realm.objects(FriendItem.self)
-//            resultFriends = friendsArray
-//        } catch {
-//            print(error)
-//        }
-//        tableView.reloadData()
-//    }
     
     func friendsFillFunc() {
        
