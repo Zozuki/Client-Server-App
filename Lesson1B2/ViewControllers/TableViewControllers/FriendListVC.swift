@@ -6,42 +6,39 @@
 //
 
 import UIKit
+import RealmSwift
+import FirebaseDatabase
+import FirebaseAuth
 
 class FriendListVC: UITableViewController {
-
+    
+    var resultFriends: Results<FriendItem>!
+    var sortUsers = [String]()
+    var userDict = [String: [String]]()
+    var usersLetters = [String]()
+    let service = VKService()
+    let interactiveTransition = InteractiveTransitionClass()
+    var token: NotificationToken?
+    var sectionsAndRowsDict = [Int: [Int]]()
+    let queue = OperationQueue()
+  
+    
     func fillUserArray() {
+        DataStorage.shared.myFriendsArray.removeAll()
+        for user in resultFriends {
+            let data = (try? Data(contentsOf: URL(string: user.photo200_Orig)!))!
+            let image = UIImage(data: data)
+            let friend = User(name: "\(user.firstName) \(user.lastName)", age: 0, avatar: image, photos: nil, id: user.id)
+            DataStorage.shared.myFriendsArray.append(friend)
+        }
         
-        
+    }
+    
+    func sortingUsers() {
+        sortUsers.removeAll()
+        usersLetters.removeAll()
         var sortedFriendsArray = [User]()
-        let photos = [UIImage(named:"Тимофей")!, UIImage(named:"Никита")!, UIImage(named:"СашаР")!,UIImage(named:"Алина")!, UIImage(named: "Коля")!]
-       
-        let user1 = User(name: "Унтевский Коля", age: 20, avatar: UIImage(named: "Коля")!, photos: photos)
-        
-        let user2 = User(name: "Попов Тимофей", age: 0, avatar: UIImage(named:"Тимофей")!, photos: photos)
-        
-        let user3 = User(name: "Головкин Александр", age: 0, avatar: UIImage(named:"СашаГ")!, photos: photos)
-        
-        let user4 = User(name: "Верзун Никита", age: 0, avatar: UIImage(named:"Никита")!, photos: photos)
-        
-        let user5 = User(name: "Кантемиров Алибек", age: 0, avatar: UIImage(named:"Алибек")!, photos: photos)
-        
-        let user6 = User(name: "Рыжков Саша", age: 0, avatar: UIImage(named:"СашаР")!, photos: photos)
-        
-        let user7 = User(name: "Апурин Артем", age: 0, avatar: nil, photos: photos)
-        
-        let user8 = User(name: "Кудряшова Алина", age: 0, avatar: UIImage(named:"Алина")!, photos: photos)
-        
-        let user9 = User(name: "Чумакова Лера", age: 0, avatar: nil, photos: photos)
-        
-        let user10 = User(name: "Унтевский Егор", age: 0, avatar: nil, photos: photos)
-        
-        let user11 = User(name: "Щекинов Ваня", age: 0, avatar: nil, photos: photos)
-        
-        DataStorage.shared.myFriendsArray.append(contentsOf: [user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11])
-        
-        // cортирую по алфавиту
         for user in DataStorage.shared.myFriendsArray {
-            
             usersLetters.append(String(user.name.first!))
             sortUsers.append(user.name)
         }
@@ -61,11 +58,8 @@ class FriendListVC: UITableViewController {
         DataStorage.shared.myFriendsArray = sortedFriendsArray
     }
     
-    var sortUsers = [String]()
-    var userDict = [String: [String]]()
-    var usersLetters = [String]()
-    
     func createUsersDict() {
+        userDict.removeAll()
         for user in sortUsers {
             // берем первую букву пользователя и наполняем словарь
             let firstLetterIndex = user.index(user.startIndex, offsetBy: 1)
@@ -79,22 +73,91 @@ class FriendListVC: UITableViewController {
         }
     }
     
-    
-    let interactiveTransition = InteractiveTransitionClass()
+    func fillDictSectionsRows() {
+        var section = -1
+        var row = -1
+        var rows = [Int]()
+        
+        let keyArr = userDict.keys.sorted(by: <)
+        for key in keyArr {
+            section += 1
+            row = -1
+            rows.removeAll()
+            for _ in userDict[key]! {
+                row += 1
+                rows.append(row)
+                sectionsAndRowsDict[section] = rows
+            }
+        }
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
-        
         self.navigationController?.delegate = self
-//        interactiveTransition.friendListVC = self
-        fillUserArray()
-        createUsersDict()
+        
+        let getDataOp = GetDataOperation()
+        queue.addOperation(getDataOp)
+
+        let parseDataOp = ParseDataOperation()
+        parseDataOp.addDependency(getDataOp)
+        queue.addOperation(parseDataOp)
+
+        let saveDataOp = SaveDataToRealmOperation()
+        saveDataOp.addDependency(parseDataOp)
+        queue.addOperation(saveDataOp)
+        
+        let reloadTableOp = ReloadTableViewOperation(viewController: self)
+        reloadTableOp.addDependency(saveDataOp) // Добавляем зависимость от ParseDataOperation
+
+        // Порядок исполнения операций
+        // GetDataOperation -> ParseDataOperation -> SaveDataToRealmOperation -> ReloadTableViewOperation
+
+
+        OperationQueue.main.addOperation(reloadTableOp)
+        
+
+    }
+    
+    func pairTableAndRealm() {
+        let realm = try! Realm()
+        print(realm.configuration.fileURL as Any)
+        token = resultFriends.observe { [weak self] changes in
+            guard let tableView = self?.tableView else { return }
+            guard let rowSectionDict = self?.sectionsAndRowsDict else { return }
+            switch changes {
+            case .initial:
+                tableView.reloadData()
+            case .update(_, let deletions, let insertions, let modifications):
+                tableView.beginUpdates()
+                self?.friendsFillFunc()
+                self?.fillDictSectionsRows()
+                for section in rowSectionDict.keys.sorted(by: <) {
+                    for row in rowSectionDict[section]! {
+                        tableView.insertRows(at: insertions.map({ _ in IndexPath(row: row, section: section) }),
+                                             with: .automatic)
+                        tableView.deleteRows(at: deletions.map({ _ in IndexPath(row: row, section: section)}),
+                                             with: .automatic)
+                        tableView.reloadRows(at: modifications.map({ _ in IndexPath(row: row, section: section) }),
+                                             with: .automatic)
+                    }
+                }
+                tableView.endUpdates()
+            case .error(let error):
+                fatalError("\(error)")
+            }
+        }
     }
     
     
+    func friendsFillFunc() {
+       
+        fillUserArray()
+        sortingUsers()
+        createUsersDict()
+    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return usersLetters.count
@@ -137,6 +200,7 @@ class FriendListVC: UITableViewController {
         
         let userKey = usersLetters[indexPath.section]
         if let userValues = userDict[userKey] {
+            
             for user in DataStorage.shared.myFriendsArray {
                 if user.name == userValues[indexPath.row] {
                     let image = user.avatar
@@ -158,7 +222,8 @@ class FriendListVC: UITableViewController {
             if let userValues = userDict[userKey] {
                 for user in DataStorage.shared.myFriendsArray {
                     if user.name == userValues[indexPath.row] {
-                        
+                        vc.id = user.id
+                        vc.userName = user.name
                         UIView.animate(withDuration: 0.4, animations: {
                             cell?.avatarView.frame.origin.x += 250
                             cell?.avatarView.alpha = 0
@@ -170,7 +235,6 @@ class FriendListVC: UITableViewController {
                         }, completion: {[weak self]_ in
                             guard let self = self else {return}
                             let image = user.avatar
-                            vc.photos = user.photos
                             vc.title = userValues[indexPath.row]
                             vc.avatar = image ?? UIImage(named: "noAvatar")!
                             self.navigationController?.pushViewController(vc, animated: true)
@@ -183,11 +247,7 @@ class FriendListVC: UITableViewController {
                                 cell?.avatar.layer.cornerRadius = 28
                                 cell?.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
                             })
-                            
                         })
-                        
-                        
-                        
                     }
                 }
             }
