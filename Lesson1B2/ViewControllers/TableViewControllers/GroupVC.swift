@@ -8,6 +8,7 @@
 import UIKit
 import RealmSwift
 
+
 class GroupVC: UITableViewController, UITextFieldDelegate {
 
     
@@ -46,15 +47,43 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         txtSearchBar.isEnabled = false
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
-       
-        service.getGroupsList()
-        pairTableAndRealm()
-        fillGroups()
+        getData()
+    }
+    
+    func getData() {
+        
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        
+        service.getGroupData()
+            .get { [unowned self] groups in
+                service.saveGroupsData(groups)
+                let realm = try! Realm()
+                self.resultGroups = realm.objects(GroupItem.self)
+                self.pairTableAndRealm()
+                self.fillGroups()
+                self.tableView.reloadData()
+            }
+            .done(on: .main) { groups in
+        
+            }
+            .catch { error in
+                self.showError(error)
+            }
+            .finally {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
+    
+    }
+    
+    private func showError(_ error: Error) {
+        let ac = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+        ac.addAction(.init(title: "Cancel", style: .cancel, handler: nil))
+        self.present(ac, animated: true)
     }
     
     func pairTableAndRealm() {
         let realm = try! Realm()
-        resultGroups = realm.objects(GroupItem.self)
+        
         print(realm.configuration.fileURL as Any)
         token = resultGroups.observe { [weak self] changes in
             guard let tableView = self?.tableView else { return }

@@ -9,11 +9,12 @@ import UIKit
 import Alamofire
 import RealmSwift
 import FirebaseFirestore
+import PromiseKit
 
 class VKService {
 
     let baseUrl = "https://api.vk.com"
-   
+    
     func clear() {
         do {
             let realm = try Realm()
@@ -23,6 +24,39 @@ class VKService {
         } catch  {
             print(error)
         }
+    }
+    
+    
+    func getGroupData() -> Promise<[GroupItem]> {
+        
+        let path = "/method/groups.get"
+        
+        let parameters: Parameters = [
+            "user_id" : Session.instance.userID,
+            "count" : "10",
+            "extended" : "1",
+            "fields" : "members_count",
+            "v" : "5.131",
+            "access_token" : Session.instance.token,
+            "lang" : "en"
+         ]
+
+        let url = baseUrl+path
+         
+        let promise = Promise<Data> { resolver in
+            AF.request(url, method: .get, parameters: parameters).responseData { response in
+                if let  data = response.data {
+                    resolver.fulfill(data)
+                }
+                
+                if let error = response.error {
+                    resolver.reject(error)
+                }
+            }
+        }.map { data in
+            return try JSONDecoder().decode(Groups.self, from: data).response.items
+        }
+         return promise
     }
     
     func getFriendList() {
@@ -44,7 +78,7 @@ class VKService {
 
          let url = baseUrl+path
     
-        AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
+       AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
             guard let data = repsonse.value else { return }
             guard let friend = try? JSONDecoder().decode(Friends.self, from: data) else { return }
             
@@ -54,6 +88,8 @@ class VKService {
             }
          }
      }
+    
+
     
     func saveFriendsData(_ friends: [FriendItem]) {
         do {
