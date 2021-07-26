@@ -26,14 +26,14 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     let service = VKService()
     var token: NotificationToken?
     
-
+    private var photoService: PhotoService?
     
     func fillGroups() {
         DataStorage.shared.myGroups.removeAll()
         for groupItem in resultGroups {
             let data = (try? Data(contentsOf: URL(string: groupItem.photo200)!))!
             let image = UIImage(data: data)
-            let group = Group(name: groupItem.name, image: image)
+            let group = Group(name: groupItem.name, image: image, photoURL: URL(string: groupItem.photo200)!)
             DataStorage.shared.myGroups.append(group)
         }
         filteredGroups = DataStorage.shared.myGroups
@@ -48,6 +48,7 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
         getData()
+        self.photoService = PhotoService(container: PhotoService.Table(tableView: self.tableView))
     }
     
     func getData() {
@@ -118,7 +119,9 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Friend", for: indexPath) as? UserTableViewCell
-        cell?.configure(text: DataStorage.shared.myGroups[indexPath.row].name, image: DataStorage.shared.myGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))
+        let group =  DataStorage.shared.myGroups[indexPath.row]
+        let image = photoService?.getPhoto(at: indexPath, url: group.photoURL)
+        cell?.configure(text: group.name, image: image ?? UIImage(named: "noAvatar"))
         
         
         return cell!

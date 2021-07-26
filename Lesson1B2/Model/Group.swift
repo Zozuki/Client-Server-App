@@ -10,4 +10,5 @@ import UIKit
 struct Group {
     var name: String
     var image: UIImage?
+    var photoURL: URL
 }

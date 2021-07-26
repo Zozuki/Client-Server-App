@@ -21,14 +21,17 @@ class FriendListVC: UITableViewController {
     var token: NotificationToken?
     var sectionsAndRowsDict = [Int: [Int]]()
     let queue = OperationQueue()
-  
+
+    private var photoService: PhotoService?
     
     func fillUserArray() {
         DataStorage.shared.myFriendsArray.removeAll()
         for user in resultFriends {
             let data = (try? Data(contentsOf: URL(string: user.photo200_Orig)!))!
+           
             let image = UIImage(data: data)
-            let friend = User(name: "\(user.firstName) \(user.lastName)", age: 0, avatar: image, photos: nil, id: user.id)
+            
+            let friend = User(name: "\(user.firstName) \(user.lastName)", age: 0, avatar: image, photoURL: URL(string: user.photo200_Orig)!, id: user.id)
             DataStorage.shared.myFriendsArray.append(friend)
         }
         
@@ -114,10 +117,11 @@ class FriendListVC: UITableViewController {
 
         // Порядок исполнения операций
         // GetDataOperation -> ParseDataOperation -> SaveDataToRealmOperation -> ReloadTableViewOperation
-
+        
 
         OperationQueue.main.addOperation(reloadTableOp)
         
+        self.photoService = PhotoService(container: PhotoService.Table(tableView: self.tableView))
 
     }
     
@@ -203,7 +207,8 @@ class FriendListVC: UITableViewController {
             
             for user in DataStorage.shared.myFriendsArray {
                 if user.name == userValues[indexPath.row] {
-                    let image = user.avatar
+                    let image = photoService?.getPhoto(at: indexPath, url: user.photoURL)
+                    
                     cell?.configure(text: userValues[indexPath.row], image: image ?? UIImage(named: "noAvatar"))
                 }
             }

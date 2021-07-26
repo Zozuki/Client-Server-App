@@ -12,6 +12,6 @@ struct User {
     var name: String
     var age: Int
     var avatar: UIImage?
-    var photos: [UIImage]?
+    var photoURL: URL
     var id: Int
 }
