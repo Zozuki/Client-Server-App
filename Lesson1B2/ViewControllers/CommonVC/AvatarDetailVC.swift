@@ -28,7 +28,7 @@ class AvatarDetailVC: UIViewController {
         interactiveTransition.viewController = self
         fullView.addGestureRecognizer(recognizer)
         service.getUserGroup(id: id, ownerName: userName)
-        
+        self.allPhotoButton.backgroundColor = .white
     }
     
     @objc func tappedView() {
