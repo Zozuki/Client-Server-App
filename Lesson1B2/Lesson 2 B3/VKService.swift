@@ -81,7 +81,7 @@ class VKService {
        AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
             guard let data = repsonse.value else { return }
             guard let friend = try? JSONDecoder().decode(Friends.self, from: data) else { return }
-            
+        
             self.saveFriendsData(friend.response.items)
             for user in friend.response.items {
                 self.saveFriendsToFirestore([user], friendName: user.firstName)
@@ -290,27 +290,28 @@ class VKService {
             "lang" : "en"
          ]
 
-         let url = baseUrl+path
-        DispatchQueue.global().async(group: getNewsGroup) {
-            AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
-                guard let data = repsonse.value else { return }
-                
-                guard let news = try? JSONDecoder().decode(NewsPhotoModel.self, from: data) else { return }
-               
-                newsItem = news.response.items
-                newsGroup = news.response.groups
-                newsProfile = news.response.profiles
-                
-                getNewsGroup.notify(queue: .main) {
-                  completion(newsItem, newsGroup, newsProfile)
-                }
+        let url = baseUrl+path
+        
+        AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
+            guard let data = repsonse.value else { return }
+            
+            
+            guard let news = try? JSONDecoder().decode(NewsPhotoModel.self, from: data) else { return }
+            
+            newsItem = news.response.items
+            newsGroup = news.response.groups
+            newsProfile = news.response.profiles
+            
+            getNewsGroup.notify(queue: .main) {
+                completion(newsItem, newsGroup, newsProfile)
             }
         }
+        
        
     }
     
     
-    func getUserPostNews(completion: @escaping ([NewsPostItem], [NewsPostGroup], [NewsPostProfile]) -> Void) {
+    func getUserPostNews(nextFrom: String, completion: @escaping ([NewsPostItem], [NewsPostGroup], [NewsPostProfile], String) -> Void) {
         
         let path = "/method/newsfeed.get"
         
@@ -325,8 +326,9 @@ class VKService {
             "filters" : "post",
             "return_banned" : "0",
             "max_photos" : "1",
-            "source_ids" : "groups",
-            "count" : "50",
+            "source_ids" : "pages",
+            "count" : "5",
+            "start_from": nextFrom,
             "v" : "5.131",
             "access_token" : Session.instance.token,
             "lang" : "en"
@@ -340,13 +342,12 @@ class VKService {
                 guard let data = repsonse.value else { return }
                 
                 guard let news = try? JSONDecoder().decode(NewsPostModel.self, from: data) else { return }
-                
                 newsItem = news.response.items
                 newsGroup = news.response.groups
                 newsProfile = news.response.profiles
-                
+                print(news.response.nextFrom)
                 getNewsGroup.notify(queue: .main) {
-                    completion(newsItem, newsGroup, newsProfile)
+                    completion(newsItem, newsGroup, newsProfile, news.response.nextFrom)
                 }
                 
             }
