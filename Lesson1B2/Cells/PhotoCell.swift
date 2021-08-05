@@ -14,6 +14,12 @@ class PhotoCell: UICollectionViewCell {
     
     var isLiked = false
     
+    
+    override func layoutSubviews() {
+        self.heartButton.backgroundColor = .white
+        self.likeLabel.backgroundColor = .white
+    }
+    
     func imageTapped() {
         UIView.animate(withDuration: 1, animations: {
             self.photoView.layer.cornerRadius = 200
