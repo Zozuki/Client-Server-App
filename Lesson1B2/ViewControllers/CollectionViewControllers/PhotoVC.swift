@@ -10,15 +10,15 @@ import RealmSwift
 
 
 class PhotoVC: UICollectionViewController {
-
-//    var photoItems = [PhotoItem]()
+    
+    let realm = try! Realm()
     var photos = [UIImage]()
     let interactiveTransition = InteractiveTransitionClass()
     let service = VKService()
     var id = Int()
     var token: NotificationToken?
     var photosArray: Results<PhotoItem>!
-    
+    var photoAlbumID = Int()
     
     func fillPhotoAlbum() {
         if photosArray.count != 0 {
@@ -36,30 +36,37 @@ class PhotoVC: UICollectionViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(id)
+        
+        let nibFile1 = UINib(nibName: "PhotoCell", bundle: nil)
+        collectionView.register(nibFile1, forCellWithReuseIdentifier: "PhotoCell")
+        
+        self.collectionView.allowsSelection = true
+        self.collectionView.backgroundColor = .white
         interactiveTransition.viewController = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reload))
-        service.getPhotosAlbum(id: id)
-        pairCollectionAndRealm()
-        fillPhotoAlbum()
+        service.getPhotosAlbum(id: id, photoAlbumID: photoAlbumID) { [unowned self] photos in
+            self.photosArray = realm.objects(PhotoItem.self).filter("ownerID == %@", self.id).filter("albumID == %@", self.photoAlbumID)
+            self.fillPhotoAlbum()
+            self.pairCollectionAndRealm()
+        }
+        
+
     }
     
     func pairCollectionAndRealm() {
-        guard let realm = try? Realm() else { return }
-               
-        photosArray = realm.objects(PhotoItem.self).filter("ownerID == %@", id)
+       
+  
         print(photosArray.count)
-       token = photosArray.observe { [weak self] (changes: RealmCollectionChange) in
+        token = photosArray.observe { [weak self] (changes: RealmCollectionChange) in
            guard let collectionView = self?.collectionView else { return }
            switch changes {
            case .initial:
                collectionView.reloadData()
            case .update(_, let deletions, let insertions, let modifications):
                collectionView.performBatchUpdates({
-                self?.fillPhotoAlbum()
-                   collectionView.insertItems(at: insertions.map({ IndexPath(row: $0, section: 0) }))
-                   collectionView.deleteItems(at: deletions.map({ IndexPath(row: $0, section: 0)}))
-                   collectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
+                   collectionView.insertItems(at: insertions.map({ IndexPath(row: 0, section: $0) }))
+                   collectionView.deleteItems(at: deletions.map({ IndexPath(row: 0, section: $0)}))
+                   collectionView.reloadItems(at: modifications.map({ IndexPath(row: 0, section: $0) }))
                }, completion: nil)
            case .error(let error):
                fatalError("\(error)")
@@ -72,15 +79,21 @@ class PhotoVC: UICollectionViewController {
         collectionView.reloadData()
     }
     
+    
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        photos.count
+    }
+    
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos.count
+        return 1
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as? PhotoCell else {
             fatalError("Unable to dequeue PhotoCell.")
         }
-        cell.photoView.image = photos[indexPath.row] 
+        cell.photoView.image = photos[indexPath.section]
+        cell.frame.size = CGSize(width: 305, height: 350)
         return cell
     }
     
@@ -102,11 +115,11 @@ class PhotoVC: UICollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "CustomGallery")
-            as? CustomGalleryVC {
-            vc.photos = photos 
-            navigationController?.pushViewController(vc, animated: true)
-        }
+        let photoVC = CustomGalleryVC()
+        photoVC.photos = photos
+        photoVC.view.backgroundColor = .white
+        photoVC.viewDidLayoutSubviews()
+        navigationController?.pushViewController(photoVC, animated: true)
     }
 
    

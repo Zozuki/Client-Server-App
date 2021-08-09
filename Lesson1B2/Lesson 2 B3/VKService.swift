@@ -128,16 +128,43 @@ class VKService {
         }
     }
 
-    func getPhotosAlbum(id: Int) {
+    func getAlbumsList(id: Int, completion: @escaping ([Item]) -> Void) {
+        
+        let path = "/method/photos.getAlbums"
+    
+        let parameters: Parameters = [
+            "owner_id" : "\(id)",
+            "count" : "5",
+            "need_covers": "1",
+            "photo_sizes" : "0",
+            "need_system": "1",
+            "v" : "5.131",
+            "access_token" : Session.instance.token,
+            "lang" : "en"
+         ]
+
+         let url = baseUrl+path
+         
+
+        AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
+            guard let data = repsonse.value else { return }
+            guard let albums = try? JSONDecoder().decode(AlbumListModel.self, from: data) else { return }
+            DispatchQueue.main.async { [weak self] in
+                completion(albums.response.items)
+            }
+        }
+    }
+    
+    func getPhotosAlbum(id: Int, photoAlbumID: Int, completion: @escaping ([PhotoItem]) -> Void) {
         
         let path = "/method/photos.get"
     
         let parameters: Parameters = [
             "owner_id" : "\(id)",
-            "album_id" : "profile",
+            "album_id" : "\(photoAlbumID)",
             "rev" : "1",
             "extended" : "1",
-            "count" : "5",
+            "count" : "4",
             "feed_type" : "photo",
             "photo_sizes" : "0",
             "v" : "5.131",
@@ -150,22 +177,26 @@ class VKService {
 
         AF.request(url, method: .get, parameters: parameters).responseData { repsonse in
             guard let data = repsonse.value else { return }
+            print(data.prettyJSON)
             guard let photo = try? JSONDecoder().decode(PhotoAlbum.self, from: data) else { return }
             DispatchQueue.main.async { [weak self] in
                 if photo.response.items.count != 0 {
-                    self?.savePhotosData(photo.response.items, id: photo.response.items[0].ownerID)
+                    self?.savePhotosData(photo.response.items, id: photo.response.items[0].ownerID, photoAlbumID: photoAlbumID)
+                    print(photoAlbumID)
+                    completion(photo.response.items)
                 }
             }
         }
         
     }
     
-    func savePhotosData(_ photos: [PhotoItem], id: Int) {
+    func savePhotosData(_ photos: [PhotoItem], id: Int, photoAlbumID: Int) {
         // обработка исключений при работе с хранилищем
         do {
             let realm = try Realm()
             // все старые  данные для текущего списка друзей
-            let oldPhoto = realm.objects(PhotoItem.self).filter("ownerID == %@", id)
+            let oldPhoto = realm.objects(PhotoItem.self).filter("ownerID == %@", id).filter("albumID == %@", photoAlbumID)
+            
             // начинаем изменять хранилище
             realm.beginWrite()
             // удаляем старые данные
