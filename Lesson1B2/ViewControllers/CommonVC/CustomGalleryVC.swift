@@ -25,12 +25,12 @@ class CustomGalleryVC: UIViewController {
     var isLastPhoto = false
     let anime2 = CASpringAnimation(keyPath: "transform.scale")
     let y: CGFloat = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let recognizer = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
         self.view.addGestureRecognizer(recognizer)
         
- 
         anime2.fromValue = 1
         anime2.toValue = 0.7
         anime2.stiffness = 50
@@ -39,8 +39,9 @@ class CustomGalleryVC: UIViewController {
         anime2.fillMode = CAMediaTimingFillMode.backwards
 
         firstSetImage()
-        
     }
+    
+  
     
     func firstSetImage() {
         photoImageView.frame = UIScreen.main.bounds
@@ -56,7 +57,6 @@ class CustomGalleryVC: UIViewController {
             suppImageView.contentMode = .scaleAspectFit
             self.view.addSubview(suppImageView)
         }
-       
     }
     
     func setImage() {
