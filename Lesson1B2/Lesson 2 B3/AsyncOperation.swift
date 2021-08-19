@@ -176,6 +176,8 @@ class ReloadTableViewOperation: Operation {
     unowned let viewController: FriendListVC
     let realm = try! Realm()
     
+    private let friendsAdapter = FriendsAdapter()
+    
     init(viewController: FriendListVC) {
         self.viewController = viewController
         super.init()
@@ -184,12 +186,17 @@ class ReloadTableViewOperation: Operation {
     override func main() {
         guard (self.dependencies.first as? SaveDataToRealmOperation) != nil else { return }
         
-        self.viewController.resultFriends = realm.objects(FriendItem.self)
-        self.viewController.friendsFillFunc()
-        self.viewController.fillDictSectionsRows()
-        self.viewController.pairTableAndRealm()
-        self.viewController.tableView.reloadData()
+        friendsAdapter.getFriends {  friends in
+            self.viewController.friends = friends
+            self.viewController.friendsFillFunc()
+            self.viewController.fillDictSectionsRows()
+            self.viewController.tableView.reloadData()
+            
+        }
+        
+        
     }
+    
 }
 
 

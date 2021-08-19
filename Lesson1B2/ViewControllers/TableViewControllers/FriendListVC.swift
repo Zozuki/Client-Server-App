@@ -6,19 +6,20 @@
 //
 
 import UIKit
-import RealmSwift
-import FirebaseDatabase
-import FirebaseAuth
+//import RealmSwift
 
 class FriendListVC: UITableViewController {
     
-    var resultFriends: Results<FriendItem>!
+//    var resultFriends: Results<FriendItem>!
+//    let service = VKService()
+//    var token: NotificationToken?
+    
+    var friends: [Friend] = []
+    
     var sortUsers = [String]()
     var userDict = [String: [String]]()
     var usersLetters = [String]()
-    let service = VKService()
     let interactiveTransition = InteractiveTransitionClass()
-    var token: NotificationToken?
     var sectionsAndRowsDict = [Int: [Int]]()
     let queue = OperationQueue()
 
@@ -26,7 +27,7 @@ class FriendListVC: UITableViewController {
     
     func fillUserArray() {
         DataStorage.shared.myFriendsArray.removeAll()
-        for user in resultFriends {
+        for user in friends {
             let data = (try? Data(contentsOf: URL(string: user.photo200_Orig)!))!
            
             let image = UIImage(data: data)
@@ -124,35 +125,35 @@ class FriendListVC: UITableViewController {
         self.photoService = PhotoService(container: PhotoService.Table(tableView: self.tableView))
     }
     
-    func pairTableAndRealm() {
-        let realm = try! Realm()
-        print(realm.configuration.fileURL as Any)
-        token = resultFriends.observe { [weak self] changes in
-            guard let tableView = self?.tableView else { return }
-            guard let rowSectionDict = self?.sectionsAndRowsDict else { return }
-            switch changes {
-            case .initial:
-                tableView.reloadData()
-            case .update(_, let deletions, let insertions, let modifications):
-                tableView.beginUpdates()
-                self?.friendsFillFunc()
-                self?.fillDictSectionsRows()
-                for section in rowSectionDict.keys.sorted(by: <) {
-                    for row in rowSectionDict[section]! {
-                        tableView.insertRows(at: insertions.map({ _ in IndexPath(row: row, section: section) }),
-                                             with: .automatic)
-                        tableView.deleteRows(at: deletions.map({ _ in IndexPath(row: row, section: section)}),
-                                             with: .automatic)
-                        tableView.reloadRows(at: modifications.map({ _ in IndexPath(row: row, section: section) }),
-                                             with: .automatic)
-                    }
-                }
-                tableView.endUpdates()
-            case .error(let error):
-                fatalError("\(error)")
-            }
-        }
-    }
+//    func pairTableAndRealm() {
+//        let realm = try! Realm()
+//        print(realm.configuration.fileURL as Any)
+//        token = resultFriends.observe { [weak self] changes in
+//            guard let tableView = self?.tableView else { return }
+//            guard let rowSectionDict = self?.sectionsAndRowsDict else { return }
+//            switch changes {
+//            case .initial:
+//                tableView.reloadData()
+//            case .update(_, let deletions, let insertions, let modifications):
+//                tableView.beginUpdates()
+//                self?.friendsFillFunc()
+//                self?.fillDictSectionsRows()
+//                for section in rowSectionDict.keys.sorted(by: <) {
+//                    for row in rowSectionDict[section]! {
+//                        tableView.insertRows(at: insertions.map({ _ in IndexPath(row: row, section: section) }),
+//                                             with: .automatic)
+//                        tableView.deleteRows(at: deletions.map({ _ in IndexPath(row: row, section: section)}),
+//                                             with: .automatic)
+//                        tableView.reloadRows(at: modifications.map({ _ in IndexPath(row: row, section: section) }),
+//                                             with: .automatic)
+//                    }
+//                }
+//                tableView.endUpdates()
+//            case .error(let error):
+//                fatalError("\(error)")
+//            }
+//        }
+//    }
     
     
     func friendsFillFunc() {
