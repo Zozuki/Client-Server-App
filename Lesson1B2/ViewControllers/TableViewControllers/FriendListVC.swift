@@ -122,7 +122,6 @@ class FriendListVC: UITableViewController {
         OperationQueue.main.addOperation(reloadTableOp)
         
         self.photoService = PhotoService(container: PhotoService.Table(tableView: self.tableView))
-
     }
     
     func pairTableAndRealm() {

@@ -111,7 +111,6 @@ class GetDataOperation: AsyncOperation {
             self.data = data
             self.finished()
             
-            guard let friend = try? JSONDecoder().decode(Friends.self, from: data) else { return }
          }
         
         // Делаем запрос

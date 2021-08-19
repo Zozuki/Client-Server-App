@@ -6,7 +6,6 @@
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
-        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -337,6 +336,7 @@
                         <connections>
                             <outlet property="dataSource" destination="sj0-Gq-aKy" id="8lD-gF-2DM"/>
                             <outlet property="delegate" destination="sj0-Gq-aKy" id="k06-N5-MOV"/>
+                            <outlet property="prefetchDataSource" destination="sj0-Gq-aKy" id="17G-J5-Zxt"/>
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Новости" id="cv7-SJ-yvp"/>
@@ -367,71 +367,17 @@
         <scene sceneID="zvT-vJ-Z5o">
             <objects>
                 <collectionViewController storyboardIdentifier="Photo" id="Mlg-tF-A6l" customClass="PhotoVC" customModule="Lesson1B2" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="gOD-ZP-KaH">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" dataMode="prototypes" id="gOD-ZP-KaH">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="axu-Cf-bgy">
-                            <size key="itemSize" width="305" height="305"/>
-                            <size key="estimatedItemSize" width="305" height="305"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" sectionInsetReference="layoutMargins" id="Xs5-q3-t2O">
+                            <size key="itemSize" width="305" height="355"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
-                        <cells>
-                            <collectionViewCell autoresizesSubviews="NO" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" reuseIdentifier="PhotoCell" id="moD-S6-fxh" customClass="PhotoCell" customModule="Lesson1B2" customModuleProvider="target">
-                                <rect key="frame" x="54.5" y="0.0" width="305" height="347"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="WEg-OK-UwH">
-                                    <rect key="frame" x="0.0" y="0.0" width="305" height="347"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hZf-fQ-dMK">
-                                            <rect key="frame" x="8" y="8" width="289" height="289"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="289" id="4rC-U9-QhX"/>
-                                                <constraint firstAttribute="height" constant="289" id="5pT-qK-njI"/>
-                                            </constraints>
-                                        </imageView>
-                                        <stackView opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="Aws-U8-u3Y">
-                                            <rect key="frame" x="8" y="305" width="43" height="42"/>
-                                            <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sQN-5o-gCi">
-                                                    <rect key="frame" x="0.0" y="0.0" width="20.5" height="42"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="35"/>
-                                                    <color key="tintColor" systemColor="labelColor"/>
-                                                    <state key="normal">
-                                                        <imageReference key="image" image="heart" catalog="system" symbolScale="default"/>
-                                                    </state>
-                                                    <connections>
-                                                        <action selector="heartButtonTapped:" destination="moD-S6-fxh" eventType="touchUpInside" id="LOZ-AO-4U8"/>
-                                                    </connections>
-                                                </button>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="75Y-eE-jgj">
-                                                    <rect key="frame" x="30.5" y="0.0" width="12.5" height="42"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </stackView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="hZf-fQ-dMK" firstAttribute="top" secondItem="WEg-OK-UwH" secondAttribute="top" constant="8" id="2Pi-YE-ddw"/>
-                                        <constraint firstItem="hZf-fQ-dMK" firstAttribute="leading" secondItem="WEg-OK-UwH" secondAttribute="leading" constant="8" id="5pX-9z-lHz"/>
-                                        <constraint firstItem="Aws-U8-u3Y" firstAttribute="leading" secondItem="WEg-OK-UwH" secondAttribute="leading" constant="8" id="Cw6-K2-n0v"/>
-                                        <constraint firstAttribute="bottom" secondItem="hZf-fQ-dMK" secondAttribute="bottom" constant="50" id="XVB-Ks-a82"/>
-                                        <constraint firstAttribute="bottom" secondItem="Aws-U8-u3Y" secondAttribute="bottom" id="adB-gc-mcg"/>
-                                        <constraint firstAttribute="trailing" secondItem="hZf-fQ-dMK" secondAttribute="trailing" constant="8" id="iqC-Lc-lE7"/>
-                                    </constraints>
-                                </collectionViewCellContentView>
-                                <size key="customSize" width="305" height="347"/>
-                                <connections>
-                                    <outlet property="heartButton" destination="sQN-5o-gCi" id="W7d-Bo-8BT"/>
-                                    <outlet property="likeLabel" destination="75Y-eE-jgj" id="Bdz-pp-gS3"/>
-                                    <outlet property="photoView" destination="hZf-fQ-dMK" id="ClI-6L-Y27"/>
-                                </connections>
-                            </collectionViewCell>
-                        </cells>
+                        <cells/>
                         <connections>
                             <outlet property="dataSource" destination="Mlg-tF-A6l" id="Xjc-TI-Qel"/>
                             <outlet property="delegate" destination="Mlg-tF-A6l" id="W7U-UH-T4F"/>
@@ -582,15 +528,11 @@
         <segue reference="n5a-Xl-1Nz"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="heart" catalog="system" width="128" height="109"/>
         <image name="magnifyingglass" catalog="system" width="128" height="115"/>
         <image name="newspaper.fill" catalog="system" width="128" height="111"/>
         <image name="person.2.fill" catalog="system" width="128" height="80"/>
         <image name="person.3.fill" catalog="system" width="128" height="61"/>
         <image name="plus" catalog="system" width="128" height="113"/>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
         <systemColor name="secondarySystemFillColor">
             <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

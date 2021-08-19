@@ -19,7 +19,7 @@ class AvatarDetailVC: UIViewController {
     let interactiveTransition = InteractiveTransitionClass()
     var id = Int()
     var userName = String()
-    var service = VKService()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +27,7 @@ class AvatarDetailVC: UIViewController {
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(tappedView))
         interactiveTransition.viewController = self
         fullView.addGestureRecognizer(recognizer)
-        service.getUserGroup(id: id, ownerName: userName)
+        
         self.allPhotoButton.backgroundColor = .white
     }
     
@@ -43,11 +43,15 @@ class AvatarDetailVC: UIViewController {
     }
     
     @IBAction func allPhotoButtonTapped(_ sender: Any) {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "Photo")
-            as? PhotoVC {
-            vc.id = id
-            navigationController?.pushViewController(vc, animated: true)
-        }
+        let newsViewController = AlbumsListTableVC(vkService: VKService())
+        newsViewController.modalPresentationStyle = .fullScreen
+        newsViewController.id = id
+        navigationController?.pushViewController(newsViewController, animated: true)
+//        if let vc = storyboard?.instantiateViewController(withIdentifier: "Photo")
+//            as? PhotoVC {
+//            vc.id = id
+//            navigationController?.pushViewController(vc, animated: true)
+//        }
     }
     
 

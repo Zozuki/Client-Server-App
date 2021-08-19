@@ -56,16 +56,13 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         
         service.getGroupData()
-            .get { [unowned self] groups in
+            .done(on: .main) { [unowned self] groups in
                 service.saveGroupsData(groups)
                 let realm = try! Realm()
                 self.resultGroups = realm.objects(GroupItem.self)
                 self.pairTableAndRealm()
                 self.fillGroups()
                 self.tableView.reloadData()
-            }
-            .done(on: .main) { groups in
-        
             }
             .catch { error in
                 self.showError(error)
@@ -120,7 +117,7 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Friend", for: indexPath) as? UserTableViewCell
         let group =  DataStorage.shared.myGroups[indexPath.row]
-        let image = photoService?.getPhoto(at: indexPath, url: group.photoURL)
+        let image = photoService?.getPhoto(at: indexPath, url: group.photoURL!)
         cell?.configure(text: group.name, image: image ?? UIImage(named: "noAvatar"))
         
         

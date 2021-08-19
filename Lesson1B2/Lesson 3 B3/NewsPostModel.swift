@@ -36,7 +36,7 @@ class NewsPostGroup: Codable {
     let photo100: String
     let isAdvertiser, isAdmin: Int
     let photo50, photo200: String
-    let type: GroupType
+  
     let screenName, name: String
     let isClosed: Int
 
@@ -48,13 +48,13 @@ class NewsPostGroup: Codable {
         case isAdmin = "is_admin"
         case photo50 = "photo_50"
         case photo200 = "photo_200"
-        case type
+       
         case screenName = "screen_name"
         case name
         case isClosed = "is_closed"
     }
 
-    init(isMember: Int, id: Int, photo100: String, isAdvertiser: Int, isAdmin: Int, photo50: String, photo200: String, type: GroupType, screenName: String, name: String, isClosed: Int) {
+    init(isMember: Int, id: Int, photo100: String, isAdvertiser: Int, isAdmin: Int, photo50: String, photo200: String,  screenName: String, name: String, isClosed: Int) {
         self.isMember = isMember
         self.id = id
         self.photo100 = photo100
@@ -62,7 +62,7 @@ class NewsPostGroup: Codable {
         self.isAdmin = isAdmin
         self.photo50 = photo50
         self.photo200 = photo200
-        self.type = type
+        
         self.screenName = screenName
         self.name = name
         self.isClosed = isClosed
@@ -77,23 +77,22 @@ enum GroupType: String, Codable {
 class NewsPostItem: Codable {
     let donut: ItemDonut
     let comments: NewsPostComments
-    let canSetCategory, isFavorite: Bool
+    let isFavorite: Bool
     let shortTextRate: Double
     let likes, reposts: NewsPostLikes
     let type, postType: PostTypeEnum
     let date, sourceID: Int
     let text: String
-    let canDoubtCategory: Bool
     let attachments: [ItemAttachment]?
     let markedAsAds, postID: Int
-    let views: NewsPostLikes
+   
     let carouselOffset, topicID, signerID: Int?
     let categoryAction: CategoryAction?
     let copyHistory: [CopyHistory]?
 
     enum CodingKeys: String, CodingKey {
         case donut, comments
-        case canSetCategory = "can_set_category"
+        
         case isFavorite = "is_favorite"
         case shortTextRate = "short_text_rate"
         case likes, reposts, type
@@ -101,11 +100,10 @@ class NewsPostItem: Codable {
         case date
         case sourceID = "source_id"
         case text
-        case canDoubtCategory = "can_doubt_category"
         case attachments
         case markedAsAds = "marked_as_ads"
         case postID = "post_id"
-        case views
+       
         case carouselOffset = "carousel_offset"
         case topicID = "topic_id"
         case signerID = "signer_id"
@@ -113,10 +111,10 @@ class NewsPostItem: Codable {
         case copyHistory = "copy_history"
     }
 
-    init(donut: ItemDonut, comments: NewsPostComments, canSetCategory: Bool, isFavorite: Bool, shortTextRate: Double, likes: NewsPostLikes, reposts: NewsPostLikes, type: PostTypeEnum, postType: PostTypeEnum, date: Int, sourceID: Int, text: String, canDoubtCategory: Bool, attachments: [ItemAttachment]?, markedAsAds: Int, postID: Int, views: NewsPostLikes, carouselOffset: Int?, topicID: Int?, signerID: Int?, categoryAction: CategoryAction?, copyHistory: [CopyHistory]?) {
+    init(donut: ItemDonut, comments: NewsPostComments, isFavorite: Bool, shortTextRate: Double, likes: NewsPostLikes, reposts: NewsPostLikes, type: PostTypeEnum, postType: PostTypeEnum, date: Int, sourceID: Int, text: String, attachments: [ItemAttachment]?, markedAsAds: Int, postID: Int,  carouselOffset: Int?, topicID: Int?, signerID: Int?, categoryAction: CategoryAction?, copyHistory: [CopyHistory]?) {
         self.donut = donut
         self.comments = comments
-        self.canSetCategory = canSetCategory
+        
         self.isFavorite = isFavorite
         self.shortTextRate = shortTextRate
         self.likes = likes
@@ -126,11 +124,11 @@ class NewsPostItem: Codable {
         self.date = date
         self.sourceID = sourceID
         self.text = text
-        self.canDoubtCategory = canDoubtCategory
+        
         self.attachments = attachments
         self.markedAsAds = markedAsAds
         self.postID = postID
-        self.views = views
+       
         self.carouselOffset = carouselOffset
         self.topicID = topicID
         self.signerID = signerID
@@ -141,20 +139,15 @@ class NewsPostItem: Codable {
 
 // MARK: - ItemAttachment
 class ItemAttachment: Codable {
-    let type: AttachmentType
-    let album: Album?
+   
     let photo: NewsPostPhoto?
-    let audio: Audio?
-    let video: Video?
-    let link: Link?
+    
+ 
 
-    init(type: AttachmentType, album: Album?, photo: NewsPostPhoto?, audio: Audio?, video: Video?, link: Link?) {
-        self.type = type
-        self.album = album
+    init(photo: NewsPostPhoto?) {
+       
         self.photo = photo
-        self.audio = audio
-        self.video = video
-        self.link = link
+        
     }
 }
 
@@ -559,7 +552,7 @@ class NewsPostProfile: Codable {
     let photo100: String
     let lastName: String
     let photo50: String
-    let onlineInfo: OnlineInfo
+    
     let sex: Int
     let isClosed: Bool?
     let firstName: String
@@ -573,7 +566,7 @@ class NewsPostProfile: Codable {
         case photo100 = "photo_100"
         case lastName = "last_name"
         case photo50 = "photo_50"
-        case onlineInfo = "online_info"
+        
         case sex
         case isClosed = "is_closed"
         case firstName = "first_name"
@@ -582,7 +575,7 @@ class NewsPostProfile: Codable {
         case onlineApp = "online_app"
     }
 
-    init(canAccessClosed: Bool?, screenName: String?, online: Int, id: Int, photo100: String, lastName: String, photo50: String, onlineInfo: OnlineInfo, sex: Int, isClosed: Bool?, firstName: String, deactivated: String?, onlineMobile: Int?, onlineApp: Int?) {
+    init(canAccessClosed: Bool?, screenName: String?, online: Int, id: Int, photo100: String, lastName: String, photo50: String,  sex: Int, isClosed: Bool?, firstName: String, deactivated: String?, onlineMobile: Int?, onlineApp: Int?) {
         self.canAccessClosed = canAccessClosed
         self.screenName = screenName
         self.online = online
@@ -590,7 +583,7 @@ class NewsPostProfile: Codable {
         self.photo100 = photo100
         self.lastName = lastName
         self.photo50 = photo50
-        self.onlineInfo = onlineInfo
+       
         self.sex = sex
         self.isClosed = isClosed
         self.firstName = firstName

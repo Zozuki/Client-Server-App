@@ -32,7 +32,7 @@ class PhotoResponse: Codable {
     var comments: Comments?
     var likes: Likes?
     var reposts: Comments? , tags: Comments?
-    dynamic var date: Int = 0, ownerID: Int = 0, postID: Int = 0
+    dynamic var date: Int = 0, ownerID: Int = 0
     dynamic var text: String = ""
     dynamic var sizes = List<Size>()
     dynamic var hasTags: Bool = false
@@ -45,14 +45,14 @@ class PhotoResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case id, comments, likes, reposts, tags, date
         case ownerID = "owner_id"
-        case postID = "post_id"
+        
         case text, sizes
         case hasTags = "has_tags"
         case albumID = "album_id"
         case canComment = "can_comment"
     }
 
-    convenience required init(id: Int, comments: Comments, likes: Likes, reposts: Comments, tags: Comments, date: Int, ownerID: Int, postID: Int, text: String, sizes: List<Size>, hasTags: Bool, albumID: Int, canComment: Int) {
+    convenience required init(id: Int, comments: Comments, likes: Likes, reposts: Comments, tags: Comments, date: Int, ownerID: Int, text: String, sizes: List<Size>, hasTags: Bool, albumID: Int, canComment: Int) {
         self.init()
         self.id = id
         self.comments = comments
@@ -61,7 +61,7 @@ class PhotoResponse: Codable {
         self.tags = tags
         self.date = date
         self.ownerID = ownerID
-        self.postID = postID
+        
         self.text = text
         self.sizes = sizes
         self.hasTags = hasTags

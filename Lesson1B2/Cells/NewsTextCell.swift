@@ -29,6 +29,8 @@ class NewsTextCell: UITableViewCell {
         clearCell()
     }
     
+    
+    
     func configure( newText: String?) {
         
         NewsText.text = newText

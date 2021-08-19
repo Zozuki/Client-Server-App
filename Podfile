@@ -14,5 +14,7 @@ pod 'Firebase/Auth'
 pod 'Firebase/Firestore'
 pod 'Firebase/Analytics'
 pod 'Firebase/Database'
+pod 'PromiseKit'
+pod 'Texture'
 
 end

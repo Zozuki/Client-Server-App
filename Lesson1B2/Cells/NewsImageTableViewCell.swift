@@ -1,4 +1,3 @@
-//
 //  NewsImageTableViewCell.swift
 //  Lesson1B2
 //
@@ -15,8 +14,10 @@ class NewsImageTableViewCell: UITableViewCell {
         imageView.clipsToBounds = true
         return imageView
     }()
+    
     var imageViewHeight = NSLayoutConstraint()
     var imageRatioWidth = CGFloat()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.addSubview(mainImageView)
@@ -24,6 +25,8 @@ class NewsImageTableViewCell: UITableViewCell {
         mainImageView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         mainImageView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         mainImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        let aspectRatioConstraint = NSLayoutConstraint(item: self.mainImageView, attribute: .height,relatedBy: .equal,toItem: self.mainImageView,attribute: .width, multiplier: (2.0 / 1.0),constant: 0)
+        self.mainImageView.addConstraint(aspectRatioConstraint)
     }
     
     required init?(coder: NSCoder) {
