@@ -188,13 +188,13 @@ class ReloadTableViewOperation: Operation {
         
         friendsAdapter.getFriends {  friends in
             self.viewController.friends = friends
+            self.viewController.viewModels = self.viewController.friendsFactory.constructViewModel(from: friends)
             self.viewController.friendsFillFunc()
             self.viewController.fillDictSectionsRows()
-            self.viewController.tableView.reloadData()
-            
+            DispatchQueue.main.async {
+                self.viewController.tableView.reloadData()
+            }
         }
-        
-        
     }
     
 }

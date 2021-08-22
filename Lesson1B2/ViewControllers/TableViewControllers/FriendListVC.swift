@@ -25,26 +25,29 @@ class FriendListVC: UITableViewController {
 
     private var photoService: PhotoService?
     
-    func fillUserArray() {
-        DataStorage.shared.myFriendsArray.removeAll()
-        for user in friends {
-            let data = (try? Data(contentsOf: URL(string: user.photo200_Orig)!))!
-           
-            let image = UIImage(data: data)
-            
-            let friend = User(name: "\(user.firstName) \(user.lastName)", age: 0, avatar: image, photoURL: URL(string: user.photo200_Orig)!, id: user.id)
-            DataStorage.shared.myFriendsArray.append(friend)
-        }
-        
-    }
+    let friendsFactory = FriendsViewModelFactory()
+    var viewModels: [FriendsViewModel] = []
+    
+//    func fillUserArray() {
+//        DataStorage.shared.myFriendsArray.removeAll()
+//        for user in friends {
+//            let data = (try? Data(contentsOf: URL(string: user.photo200_Orig)!))!
+//
+//            let image = UIImage(data: data)
+//
+//            let friend = User(name: "\(user.firstName) \(user.lastName)", age: 0, avatar: image, photoURL: URL(string: user.photo200_Orig)!, id: user.id)
+//            DataStorage.shared.myFriendsArray.append(friend)
+//        }
+//
+//    }
     
     func sortingUsers() {
         sortUsers.removeAll()
         usersLetters.removeAll()
-        var sortedFriendsArray = [User]()
-        for user in DataStorage.shared.myFriendsArray {
-            usersLetters.append(String(user.name.first!))
-            sortUsers.append(user.name)
+        var sortedFriendsArray = [Friend]()
+        for user in friends {
+            usersLetters.append(String(user.firstName.first!))
+            sortUsers.append(user.firstName)
         }
         
         let unique = Array(Set(usersLetters))
@@ -53,13 +56,13 @@ class FriendListVC: UITableViewController {
         usersLetters = usersLetters.sorted(by: <)
     
         for sortUser in sortUsers  {
-            for user in DataStorage.shared.myFriendsArray {
-                if user.name == sortUser {
+            for user in friends {
+                if user.firstName == sortUser {
                     sortedFriendsArray.append(user)
                 }
             }
         }
-        DataStorage.shared.myFriendsArray = sortedFriendsArray
+//        DataStorage.shared.myFriendsArray = sortedFriendsArray
     }
     
     func createUsersDict() {
@@ -93,7 +96,6 @@ class FriendListVC: UITableViewController {
                 sectionsAndRowsDict[section] = rows
             }
         }
-        
     }
     
     override func viewDidLoad() {
@@ -157,8 +159,7 @@ class FriendListVC: UITableViewController {
     
     
     func friendsFillFunc() {
-       
-        fillUserArray()
+//        fillUserArray()
         sortingUsers()
         createUsersDict()
     }
@@ -204,12 +205,12 @@ class FriendListVC: UITableViewController {
         
         let userKey = usersLetters[indexPath.section]
         if let userValues = userDict[userKey] {
-            
-            for user in DataStorage.shared.myFriendsArray {
-                if user.name == userValues[indexPath.row] {
-                    let image = photoService?.getPhoto(at: indexPath, url: user.photoURL)
+            for user in viewModels {
+                if user.firstName == userValues[indexPath.row] {
+//                    let image = photoService?.getPhoto(at: indexPath, url: user.photoURL)
                     
-                    cell?.configure(text: userValues[indexPath.row], image: image ?? UIImage(named: "noAvatar"))
+//                    cell?.configure(text: userValues[indexPath.row], image: image ?? UIImage(named: "noAvatar"))
+                    cell?.configureWithFactory(friendViewModel: user)
                 }
             }
         }
@@ -225,10 +226,10 @@ class FriendListVC: UITableViewController {
             as? AvatarDetailVC {
             let userKey = usersLetters[indexPath.section]
             if let userValues = userDict[userKey] {
-                for user in DataStorage.shared.myFriendsArray {
-                    if user.name == userValues[indexPath.row] {
+                for user in viewModels {
+                    if user.firstName == userValues[indexPath.row] {
                         vc.id = user.id
-                        vc.userName = user.name
+                        vc.userName = user.firstName
                         UIView.animate(withDuration: 0.4, animations: {
                             cell?.avatarView.frame.origin.x += 250
                             cell?.avatarView.alpha = 0
@@ -239,9 +240,9 @@ class FriendListVC: UITableViewController {
                             
                         }, completion: {[weak self]_ in
                             guard let self = self else {return}
-                            let image = user.avatar
+                            let image = user.photo
                             vc.title = userValues[indexPath.row]
-                            vc.avatar = image ?? UIImage(named: "noAvatar")!
+                            vc.avatar = image
                             self.navigationController?.pushViewController(vc, animated: true)
                             
                             UIView.animate(withDuration: 0.15, delay: 1, animations: {

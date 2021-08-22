@@ -81,4 +81,12 @@ class UserTableViewCell: UITableViewCell {
         titleLabelFrame()
         avatarFrame()
     }
+    
+    // Factory
+    func configureWithFactory(friendViewModel: FriendsViewModel) {
+        avatar.image = friendViewModel.photo
+        titleLabel.text = "\(friendViewModel.firstName)  \(friendViewModel.lastName)"
+        titleLabelFrame()
+        avatarFrame()
+    }
 }
