@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell autoresizesSubviews="NO" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" reuseIdentifier="PhotoCell" id="fix-uq-xsg" customClass="PhotoCell" customModule="Lesson1B2" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="305" height="350"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="ufQ-Zd-tYL">
+                <rect key="frame" x="0.0" y="0.0" width="305" height="350"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zEU-mO-SlF">
+                        <rect key="frame" x="8" y="8" width="289" height="289"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="289" id="Z3A-dZ-VIB"/>
+                            <constraint firstAttribute="width" constant="289" id="nwL-mr-cOI"/>
+                        </constraints>
+                    </imageView>
+                    <stackView opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="dj3-3t-SAR">
+                        <rect key="frame" x="8" y="305" width="43" height="42"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kUf-hn-wYE">
+                                <rect key="frame" x="0.0" y="0.0" width="20.5" height="42"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
+                                <color key="tintColor" systemColor="labelColor"/>
+                                <state key="normal">
+                                    <imageReference key="image" image="heart" catalog="system" symbolScale="default"/>
+                                </state>
+                                <connections>
+                                    <action selector="heartButtonTapped:" destination="fix-uq-xsg" eventType="touchUpInside" id="2LK-l9-KCq"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bgg-bC-586">
+                                <rect key="frame" x="30.5" y="0.0" width="12.5" height="42"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                    </stackView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="dj3-3t-SAR" firstAttribute="leading" secondItem="ufQ-Zd-tYL" secondAttribute="leading" constant="8" id="4KU-ex-jLg"/>
+                    <constraint firstItem="dj3-3t-SAR" firstAttribute="top" secondItem="zEU-mO-SlF" secondAttribute="bottom" constant="8" id="F7B-kJ-yGg"/>
+                    <constraint firstItem="zEU-mO-SlF" firstAttribute="top" secondItem="ufQ-Zd-tYL" secondAttribute="top" constant="8" id="Q5h-2C-n00"/>
+                    <constraint firstAttribute="bottom" secondItem="dj3-3t-SAR" secondAttribute="bottom" id="bUn-Rr-5eX"/>
+                    <constraint firstAttribute="bottom" secondItem="zEU-mO-SlF" secondAttribute="bottom" constant="50" id="hjN-O8-aqH"/>
+                    <constraint firstAttribute="trailing" secondItem="zEU-mO-SlF" secondAttribute="trailing" constant="8" id="ucr-aJ-qem"/>
+                    <constraint firstItem="zEU-mO-SlF" firstAttribute="leading" secondItem="ufQ-Zd-tYL" secondAttribute="leading" constant="8" id="yPk-wz-hKj"/>
+                </constraints>
+            </collectionViewCellContentView>
+            <size key="customSize" width="305" height="347"/>
+            <connections>
+                <outlet property="heartButton" destination="kUf-hn-wYE" id="CLa-Fi-8m6"/>
+                <outlet property="likeLabel" destination="bgg-bC-586" id="7bN-Ud-HhO"/>
+                <outlet property="photoView" destination="zEU-mO-SlF" id="0Do-Wm-ava"/>
+            </connections>
+            <point key="canvasLocation" x="-41" y="-93"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="heart" catalog="system" width="128" height="109"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
