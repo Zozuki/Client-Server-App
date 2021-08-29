@@ -22,4 +22,5 @@ class DataStorage: NSObject {
     
     var allGroups = [Group]()
     var myGroups = [Group]()
+    
 }

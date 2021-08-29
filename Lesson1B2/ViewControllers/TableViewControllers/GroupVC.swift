@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RealmSwift
+
 
 class GroupVC: UITableViewController, UITextFieldDelegate {
 
@@ -19,27 +21,93 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     
     @IBOutlet weak var txtSearchBar: UITextField!
     
+    var resultGroups: Results<GroupItem>!
     var filteredGroups = [Group]()
+    let service = VKService()
+    var token: NotificationToken?
     
+    private var photoService: PhotoService?
+    
+    func fillGroups() {
+        DataStorage.shared.myGroups.removeAll()
+        for groupItem in resultGroups {
+            let data = (try? Data(contentsOf: URL(string: groupItem.photo200)!))!
+            let image = UIImage(data: data)
+            let group = Group(name: groupItem.name, image: image, photoURL: URL(string: groupItem.photo200)!)
+            DataStorage.shared.myGroups.append(group)
+        }
+        filteredGroups = DataStorage.shared.myGroups
+    }
+    
+    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         txtSearchBar.delegate = self
         txtSearchBar.isEnabled = false
-        filteredGroups = DataStorage.shared.myGroups
         let nibFile = UINib(nibName: "UserTableViewCell", bundle: nil)
         tableView.register(nibFile, forCellReuseIdentifier: "Friend")
+        getData()
+        self.photoService = PhotoService(container: PhotoService.Table(tableView: self.tableView))
+    }
+    
+    func getData() {
         
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        
+        service.getGroupData()
+            .done(on: .main) { [unowned self] groups in
+                service.saveGroupsData(groups)
+                let realm = try! Realm()
+                self.resultGroups = realm.objects(GroupItem.self)
+                self.pairTableAndRealm()
+                self.fillGroups()
+                self.tableView.reloadData()
+            }
+            .catch { error in
+                self.showError(error)
+            }
+            .finally {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
+    
+    }
+    
+    private func showError(_ error: Error) {
+        let ac = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+        ac.addAction(.init(title: "Cancel", style: .cancel, handler: nil))
+        self.present(ac, animated: true)
+    }
+    
+    func pairTableAndRealm() {
+        let realm = try! Realm()
+        
+        print(realm.configuration.fileURL as Any)
+        token = resultGroups.observe { [weak self] changes in
+            guard let tableView = self?.tableView else { return }
+            switch changes {
+            case .initial:
+                tableView.reloadData()
+            case .update(_, let deletions, let insertions, let modifications):
+                tableView.beginUpdates()
+                self?.fillGroups()
+                self?.tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+                                                    with: .automatic)
+                self?.tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+                                                    with: .automatic)
+                self?.tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+                                                    with: .automatic)
+                tableView.endUpdates()
+            case .error(let error):
+                fatalError("\(error)")
+            }
+        }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
     
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        tableView.reloadData()
-    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return DataStorage.shared.myGroups.count
@@ -48,7 +116,9 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Friend", for: indexPath) as? UserTableViewCell
-        cell?.configure(text: DataStorage.shared.myGroups[indexPath.row].name, image: DataStorage.shared.myGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))
+        let group =  DataStorage.shared.myGroups[indexPath.row]
+        let image = photoService?.getPhoto(at: indexPath, url: group.photoURL!)
+        cell?.configure(text: group.name, image: image ?? UIImage(named: "noAvatar"))
         
         
         return cell!
@@ -62,7 +132,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
             var photos = [UIImage]()
             photos.append((DataStorage.shared.myGroups[indexPath.row].image ?? UIImage(named: "noAvatar"))!)
             vc.avatar = DataStorage.shared.myGroups[indexPath.row].image ?? UIImage(named: "noAvatar")!
-            vc.photos = photos
             navigationController?.pushViewController(vc, animated: true)
         }
         
@@ -85,7 +154,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
 
             tableView.endUpdates()
         }
-        
     }
     
     //MARK: Txt Search bar config
@@ -104,7 +172,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
     @IBAction func clearButtonTapped(_ sender: Any) {
         txtSearchBar.text = ""
         UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
-//            self.txtSearchBar.isEnabled = false
             self.trailingTxtSearchBarConstraint.constant = 0
             self.loupeButtonConstarint.constant = 200
         }, completion: {_ in
@@ -125,7 +192,6 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         } else {
             DataStorage.shared.myGroups.removeAll()
             DataStorage.shared.myGroups = filteredGroups
-            trailingTxtSearchBarConstraint.constant = 0
             tableView.reloadData()
         }
         tableView.reloadData()
@@ -160,6 +226,5 @@ class GroupVC: UITableViewController, UITextFieldDelegate {
         return true
     }
     
-    //MARK: Search bar config
 
 }

@@ -8,11 +8,18 @@
 import UIKit
 
 class PhotoCell: UICollectionViewCell {
+    
     @IBOutlet weak var photoView: UIImageView!
     @IBOutlet weak var heartButton: UIButton!
     @IBOutlet weak var likeLabel: UILabel!
     
     var isLiked = false
+    
+    
+    override func layoutSubviews() {
+        self.heartButton.backgroundColor = .white
+        self.likeLabel.backgroundColor = .white
+    }
     
     func imageTapped() {
         UIView.animate(withDuration: 1, animations: {
@@ -38,9 +45,7 @@ class PhotoCell: UICollectionViewCell {
                 anime.fillMode = CAMediaTimingFillMode.backwards
                 
                 self.heartButton.layer.add(anime, forKey: nil)
-                
             })
-           
         } else {
             UIView.animate(withDuration: 0.7, animations: { [weak self] in
                 guard let self = self else {return}
