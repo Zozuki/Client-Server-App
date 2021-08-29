@@ -8,10 +8,39 @@
 import UIKit
 import Alamofire
 import RealmSwift
-import FirebaseFirestore
 import PromiseKit
 
-class VKService {
+
+protocol VKServiceProtocol {
+    func getAlbumsList(id: Int, completion: @escaping ([Item]) -> Void)
+}
+
+
+class VKServiceCachingProxy: VKServiceProtocol {
+    let VKService: VKServiceProtocol
+    
+    var cache: [Int: [Item]] = [:]
+    
+    init(base: VKServiceProtocol) {
+        self.VKService = base
+    }
+    
+    func getAlbumsList(id: Int, completion: @escaping ([Item]) -> Void) {
+        if let albumsFromCache = cache[id] {
+            print("data from cache")
+            completion(albumsFromCache)
+            return
+        }
+        VKService.getAlbumsList(id: id) { [weak self] albums in
+            guard let self = self else { return }
+            print("data cached")
+            self.cache[id] = albums
+            completion(albums)
+        }
+    }
+}
+
+class VKService: VKServiceProtocol {
 
     let baseUrl = "https://api.vk.com"
     
@@ -83,9 +112,9 @@ class VKService {
             guard let friend = try? JSONDecoder().decode(Friends.self, from: data) else { return }
         
             self.saveFriendsData(friend.response.items)
-            for user in friend.response.items {
-                self.saveFriendsToFirestore([user], friendName: user.firstName)
-            }
+//            for user in friend.response.items {
+//                self.saveFriendsToFirestore([user], friendName: user.firstName)
+//            }
          }
      }
     
@@ -116,17 +145,17 @@ class VKService {
         }
     }
     
-    private func saveFriendsToFirestore(_ users: [FriendItem], friendName: String) {
-        let database = Firestore.firestore()
-        let usersToSend = users
-            .map { $0.toFirestore() }
-            .reduce([:]) { $0.merging($1) { (current, _) in current } }
-        database.collection("users").document(friendName).setData(usersToSend, merge: true) { error in
-        if let error = error {
-            print(error.localizedDescription)
-            } else { print("data saved")}
-        }
-    }
+//    private func saveFriendsToFirestore(_ users: [FriendItem], friendName: String) {
+//        let database = Firestore.firestore()
+//        let usersToSend = users
+//            .map { $0.toFirestore() }
+//            .reduce([:]) { $0.merging($1) { (current, _) in current } }
+//        database.collection("users").document(friendName).setData(usersToSend, merge: true) { error in
+//        if let error = error {
+//            print(error.localizedDescription)
+//            } else { print("data saved")}
+//        }
+//    }
 
     func getAlbumsList(id: Int, completion: @escaping ([Item]) -> Void) {
         
@@ -279,24 +308,24 @@ class VKService {
             guard let data = repsonse.value else { return }
             guard let groups = try? JSONDecoder().decode(Groups.self, from: data) else { return }
             print(groups.response.items.count)
-            for group in groups.response.items {
-                self?.saveGroupsToFirestore([group], groupName: group.name, ownerName: ownerName)
-            }
+//            for group in groups.response.items {
+//                self?.saveGroupsToFirestore([group], groupName: group.name, ownerName: ownerName)
+//            }
             
          }
     }
     
-    private func saveGroupsToFirestore(_ groups: [GroupItem], groupName: String, ownerName: String) {
-        let database = Firestore.firestore()
-        let groupsToSend = groups
-            .map { $0.toFirestore(owner: groupName) }
-            .reduce([:]) { $0.merging($1) { (current, _) in current } }
-        database.collection("\(ownerName)'s groups").document(groupName).setData(groupsToSend, merge: true) { error in
-        if let error = error {
-            print(error.localizedDescription)
-            } else { print("data saved")}
-        }
-    }
+//    private func saveGroupsToFirestore(_ groups: [GroupItem], groupName: String, ownerName: String) {
+//        let database = Firestore.firestore()
+//        let groupsToSend = groups
+//            .map { $0.toFirestore(owner: groupName) }
+//            .reduce([:]) { $0.merging($1) { (current, _) in current } }
+//        database.collection("\(ownerName)'s groups").document(groupName).setData(groupsToSend, merge: true) { error in
+//        if let error = error {
+//            print(error.localizedDescription)
+//            } else { print("data saved")}
+//        }
+//    }
 
     
     func getUserPhotosNews(completion: @escaping ([NewsPhotoItem], [NewsPhotoGroup], [NewsPhotoProfile]) -> Void) {

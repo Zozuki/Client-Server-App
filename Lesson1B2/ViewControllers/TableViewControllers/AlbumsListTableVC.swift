@@ -11,6 +11,7 @@ import AsyncDisplayKit
 class AlbumsListTableVC: ASDKViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
     
     private let vkService: VKService
+    private let vkServiceCachingProxy: VKServiceCachingProxy
     private var items: [Item] = []
     var id = Int()
     
@@ -24,6 +25,7 @@ class AlbumsListTableVC: ASDKViewController<ASTableNode>, ASTableDelegate, ASTab
     
     init(vkService: VKService) {
         self.vkService = vkService
+        self.vkServiceCachingProxy = VKServiceCachingProxy(base: vkService)
         super.init(node: ASTableNode())
         self.node.delegate = self
         self.node.dataSource = self
@@ -44,7 +46,7 @@ class AlbumsListTableVC: ASDKViewController<ASTableNode>, ASTableDelegate, ASTab
     }
     
     private func getData() {
-        vkService.getAlbumsList(id: id) { [unowned self] items in
+        vkServiceCachingProxy.getAlbumsList(id: id) { [unowned self] items in
             self.items = items
             self.refreshControl.endRefreshing()
             self.node.reloadData()
